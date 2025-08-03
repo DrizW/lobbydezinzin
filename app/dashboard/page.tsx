@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import ClientOnly from "../components/ClientOnly";
 
 type Country = {
   id: string;
@@ -27,10 +28,17 @@ export default function DashboardPage() {
       .catch(() => setLoading(false));
   }, []);
 
+  const getKdColor = (kd: number) => {
+    if (kd <= 0.9) return "text-green-400";
+    if (kd <= 1.1) return "text-yellow-400";
+    return "text-orange-400";
+  };
+
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <ClientOnly>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div className="max-w-7xl mx-auto px-6 py-10">
         {/* Header */}
         <div className="text-center mb-12">
@@ -92,7 +100,7 @@ export default function DashboardPage() {
         <div className="mb-12">
           <h2 className="text-3xl font-bold mb-8 text-center">
             <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
-              SERVEURS DNS
+              PAYS
             </span>
             <span className="text-white"> DISPONIBLES</span>
           </h2>
@@ -100,50 +108,64 @@ export default function DashboardPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-              <p className="text-gray-400 mt-4">Chargement des serveurs...</p>
+              <p className="text-gray-400 mt-4">Chargement des pays...</p>
             </div>
           ) : (
-            <div className="space-y-8">
-              {continents.map(continent => {
-                const servers = dnsServers.filter(s => s.continent === continent);
-                if (servers.length === 0) return null;
-
-                return (
-                  <div key={continent} className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 overflow-hidden">
-                    <div className={`bg-gradient-to-r ${getContinentColor(continent)} p-6`}>
-                      <div className="flex items-center space-x-3">
-                        <span className="text-3xl">{getContinentIcon(continent)}</span>
-                        <h3 className="text-2xl font-bold text-white">{continent}</h3>
-                        <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium text-white">
-                          {servers.length} serveur{servers.length > 1 ? 's' : ''}
-                        </span>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {countries.map(country => (
+                <div key={country.id} className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-6 hover:border-orange-500/50 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-3xl">{country.flag}</span>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">{country.name}</h3>
+                        <p className="text-sm text-gray-400">{country.description}</p>
                       </div>
                     </div>
-                    
-                    <div className="p-6">
-                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {servers.map(server => (
-                          <div key={server.ip} className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/30 hover:border-orange-500/50 transition-all duration-300 group">
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-orange-400 font-mono text-sm">{server.ip}</span>
-                              <button 
-                                onClick={() => navigator.clipboard.writeText(server.ip)}
-                                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-3 py-1 rounded-lg text-white text-xs font-medium transition-all duration-200 opacity-0 group-hover:opacity-100"
-                              >
-                                Copier
-                              </button>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                              <span className="text-gray-400 text-sm">En ligne</span>
-                            </div>
-                          </div>
-                        ))}
+                    <div className={`text-right ${getKdColor(country.kdValue)}`}>
+                      <div className="text-lg font-bold">{country.kdRange}</div>
+                      <div className="text-xs">KD moyen</div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-400">DNS Principal:</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-white font-mono">{country.dnsPrimary}</span>
+                        <button
+                          onClick={() => navigator.clipboard?.writeText(country.dnsPrimary)}
+                          className="bg-orange-500 hover:bg-orange-600 px-2 py-1 rounded text-white text-xs transition-colors"
+                        >
+                          Copier
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-400">DNS Secondaire:</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-white font-mono">{country.dnsSecondary}</span>
+                        <button
+                          onClick={() => navigator.clipboard?.writeText(country.dnsSecondary)}
+                          className="bg-orange-500 hover:bg-orange-600 px-2 py-1 rounded text-white text-xs transition-colors"
+                        >
+                          Copier
+                        </button>
                       </div>
                     </div>
                   </div>
-                );
-              })}
+
+                  <div className="mt-4 pt-4 border-t border-gray-700/50">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-400">Statut:</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span className="text-green-400 text-sm">En ligne</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -213,5 +235,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+    </ClientOnly>
   );
 } 
