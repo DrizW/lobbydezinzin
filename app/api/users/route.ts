@@ -22,7 +22,7 @@ export async function GET() {
     // Transformer les données pour l'affichage
     const usersWithStatus = users.map(user => {
       const activeSubscription = user.subscriptions.find(sub => 
-        sub.status === 'active' && sub.currentPeriodEnd > new Date()
+        sub.status === "active" && sub.currentPeriodEnd > new Date()
       );
       
       return {
