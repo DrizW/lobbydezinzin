@@ -17,8 +17,9 @@ export async function GET(request: NextRequest) {
         email: true,
         allowedIPs: true,
         role: true,
-        subscription: {
+        subscriptions: {
           select: {
+            id: true,
             status: true,
             currentPeriodEnd: true
           }
