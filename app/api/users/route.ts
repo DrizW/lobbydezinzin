@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 // GET - Récupérer tous les utilisateurs
 export async function GET() {
@@ -13,6 +11,7 @@ export async function GET() {
         role: true,
         subscriptions: {
           select: {
+            id: true,
             status: true,
             currentPeriodEnd: true
           }

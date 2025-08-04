@@ -17,9 +17,8 @@ export async function GET(request: NextRequest) {
     } else if (cfIP) {
       clientIP = cfIP;
     } else {
-      // Fallback vers l'IP de connexion
-      const ip = request.ip || '127.0.0.1';
-      clientIP = ip;
+      // Fallback - request.ip not available in App Router
+      clientIP = '127.0.0.1';
     }
 
     // Nettoyer l'IP (enlever le port si présent)
