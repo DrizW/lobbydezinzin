@@ -30,9 +30,7 @@ export async function GET(request: NextRequest) {
     if (clientIP === '127.0.0.1' || clientIP === '::1' || clientIP.startsWith('192.168.') || clientIP.startsWith('10.')) {
       try {
         // En développement, utiliser un service externe pour obtenir l'IP publique
-        const response = await fetch('https://api.ipify.org?format=json', {
-          timeout: 3000
-        });
+        const response = await fetch('https://api.ipify.org?format=json');
         if (response.ok) {
           const data = await response.json();
           clientIP = data.ip;
