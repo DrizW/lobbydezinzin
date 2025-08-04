@@ -1,20 +1,89 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const countries = await prisma.country.findMany({
-      where: {
-        isActive: true
-      },
-      orderBy: {
-        kdValue: 'asc'
+    // Vérifier la session utilisateur
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Authentification requise pour accéder aux DNS" },
+        { status: 401 }
+      );
+    }
+
+    // Récupérer les informations utilisateur avec abonnements
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        subscriptions: {
+          where: {
+            status: 'active',
+            currentPeriodEnd: {
+              gt: new Date()
+            }
+          }
+        }
       }
     });
 
-    return NextResponse.json(countries);
+    if (!user) {
+      return NextResponse.json(
+        { error: "Utilisateur non trouvé" },
+        { status: 404 }
+      );
+    }
+
+    // Vérifier l'abonnement actif ou si admin
+    const hasActiveSubscription = user.subscriptions.length > 0;
+    const isAdmin = user.role === 'ADMIN';
+    
+    if (!hasActiveSubscription && !isAdmin) {
+      // Retourner les pays sans les DNS pour les utilisateurs non abonnés
+      const countries = await prisma.country.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          flag: true,
+          kdRange: true,
+          kdValue: true,
+          description: true,
+          color: true,
+          // Ne pas inclure dnsPrimary et dnsSecondary
+        },
+        orderBy: { kdValue: 'asc' }
+      });
+
+      return NextResponse.json({
+        countries: countries.map(country => ({
+          ...country,
+          dnsPrimary: "PREMIUM REQUIS",
+          dnsSecondary: "PREMIUM REQUIS",
+          isPremium: true
+        })),
+        requiresSubscription: true,
+        message: "Abonnement Premium requis pour accéder aux DNS"
+      });
+    }
+
+    // Utilisateur abonné ou admin - retourner toutes les données
+    const countries = await prisma.country.findMany({
+      where: { isActive: true },
+      orderBy: { kdValue: 'asc' }
+    });
+
+    return NextResponse.json({
+      countries,
+      requiresSubscription: false,
+      hasAccess: true
+    });
+
   } catch (error) {
     console.error("Erreur lors de la récupération des pays:", error);
     return NextResponse.json(

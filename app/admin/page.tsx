@@ -1,322 +1,327 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-const continents = ["Europe", "Amérique", "Asie"];
+type User = {
+  id: string;
+  email: string;
+  role: string;
+  status: string;
+  subscriptionId?: string;
+  subscriptionEnd?: string;
+};
 
 export default function AdminPage() {
-  const [dnsServers, setDnsServers] = useState<{ip: string, continent: string}[]>([]);
-  const [ip, setIp] = useState("");
-  const [continent, setContinent] = useState("Europe");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  // Fetch DNS servers on mount
-  useEffect(() => {
-    fetchDns();
-  }, []);
-
-  async function fetchDns() {
-    setLoading(true);
-    const res = await fetch("/api/dns");
-    const data = await res.json();
-    setDnsServers(data);
-    setLoading(false);
-  }
-
-  async function addServer(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    if (!ip) return;
-    const res = await fetch("/api/dns", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ip, continent }),
-    });
-    if (res.ok) {
-      setIp("");
-      fetchDns();
-    } else {
-      const data = await res.json();
-      setError(data.error || "Erreur lors de l'ajout");
-    }
-  }
-
-  async function removeServer(ipToRemove: string) {
-    setError("");
-    const res = await fetch("/api/dns", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ip: ipToRemove }),
-    });
-    if (res.ok) {
-      fetchDns();
-    } else {
-      setError("Erreur lors de la suppression");
-    }
-  }
-
-  // Pour l'édition DNS
-  const [editingIp, setEditingIp] = useState<string | null>(null);
-  const [editIp, setEditIp] = useState("");
-  const [editContinent, setEditContinent] = useState(continents[0]);
-
-  function startEditDns(server: { ip: string; continent: string }) {
-    setEditingIp(server.ip);
-    setEditIp(server.ip);
-    setEditContinent(server.continent);
-  }
-
-  async function saveEditDns() {
-    if (!editingIp) return;
-    const res = await fetch("/api/dns", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ oldIp: editingIp, newIp: editIp, continent: editContinent }),
-    });
-    if (res.ok) {
-      setEditingIp(null);
-      setEditIp("");
-      setEditContinent(continents[0]);
-      fetchDns();
-    } else {
-      const data = await res.json();
-      setError(data.error || "Erreur lors de la modification");
-    }
-  }
-
-  function cancelEditDns() {
-    setEditingIp(null);
-    setEditIp("");
-    setEditContinent(continents[0]);
-  }
-
-  // Liste des utilisateurs abonnés depuis l'API
-  const [users, setUsers] = useState<{ email: string; status: string }[]>([]);
-  const [usersLoading, setUsersLoading] = useState(true);
-  const [usersError, setUsersError] = useState("");
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/users")
-      .then(res => {
-        if (!res.ok) {
-          throw new Error("Erreur lors du chargement des utilisateurs");
-        }
-        return res.json();
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setUsers(data);
-        } else {
-          setUsers([]);
-          setUsersError("Format de données invalide");
-        }
-      })
-      .catch(error => {
-        console.error("Erreur:", error);
-        setUsers([]);
-        setUsersError("Erreur lors du chargement des utilisateurs");
-      })
-      .finally(() => {
-        setUsersLoading(false);
+    if (status === "loading") return;
+    
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+
+    // Vérifier si l'utilisateur est admin
+    if (session.user?.role !== "ADMIN") {
+      router.push("/dashboard");
+      return;
+    }
+
+    fetchUsers();
+  }, [session, status, router]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("/api/users");
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      }
+    } catch (error) {
+      console.error("Erreur chargement utilisateurs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleSubscription = async (userId: string, currentStatus: string) => {
+    setActionLoading(userId);
+    
+    try {
+      const response = await fetch("/api/admin/toggle-subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          userId, 
+          activate: currentStatus !== "actif" 
+        }),
       });
-  }, []);
 
-  // Suppression d'un utilisateur
-  async function removeUser(email: string) {
-    if (!window.confirm(`Supprimer l'utilisateur ${email} ?`)) return;
-    const res = await fetch("/api/users", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    if (res.ok) {
-      setUsers(users => users.filter(u => u.email !== email));
-    } else {
-      alert("Erreur lors de la suppression");
+      if (response.ok) {
+        await fetchUsers(); // Recharger la liste
+      } else {
+        alert("Erreur lors de la modification");
+      }
+    } catch (error) {
+      console.error("Erreur:", error);
+      alert("Erreur de connexion");
+    } finally {
+      setActionLoading(null);
     }
+  };
+
+  const deleteUser = async (userId: string, email: string) => {
+    if (!confirm(`Supprimer l'utilisateur ${email} ?`)) return;
+    
+    setActionLoading(userId);
+    
+    try {
+      const response = await fetch("/api/users", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        await fetchUsers(); // Recharger la liste
+      } else {
+        alert("Erreur lors de la suppression");
+      }
+    } catch (error) {
+      console.error("Erreur:", error);
+      alert("Erreur de connexion");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  if (status === "loading" || loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mb-4"></div>
+          <p className="text-gray-400">Chargement du panel admin...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div className="max-w-7xl mx-auto px-6 py-10">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
-              ADMIN
-            </span>
-            <span className="text-white"> PANEL</span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Gestion des serveurs DNS et des utilisateurs
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">
+              <span className="bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
+                PANEL
+              </span>
+              <span className="text-white"> ADMIN</span>
+            </h1>
+            <p className="text-gray-400">Gestion des utilisateurs et abonnements</p>
+          </div>
+          <Link href="/dashboard">
+            <button className="bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-lg text-white transition-colors">
+              ← Retour Dashboard
+            </button>
+          </Link>
         </div>
 
-        {/* DNS Management Section */}
-        <section className="mb-12">
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-8">
-            <h2 className="text-3xl font-bold mb-6 text-center">
-              <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
-                GESTION
-              </span>
-              <span className="text-white"> DES SERVEURS DNS</span>
-            </h2>
-            
-            <form onSubmit={addServer} className="flex flex-col md:flex-row gap-4 mb-8 p-6 bg-gray-800/50 rounded-xl border border-gray-700/30">
-              <input
-                type="text"
-                placeholder="IP du serveur"
-                value={ip}
-                onChange={e => setIp(e.target.value)}
-                className="flex-1 border border-gray-600 bg-gray-700 text-white p-3 rounded-lg focus:border-orange-500 focus:outline-none transition-colors"
-                required
-              />
-              <select
-                value={continent}
-                onChange={e => setContinent(e.target.value)}
-                className="border border-gray-600 bg-gray-700 text-white p-3 rounded-lg focus:border-orange-500 focus:outline-none transition-colors"
-              >
-                {continents.map(c => <option key={c}>{c}</option>)}
-              </select>
-              <button type="submit" className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-6 py-3 rounded-lg text-white font-bold transition-all duration-200 shadow-lg hover:shadow-orange-500/25">
-                Ajouter
-              </button>
-            </form>
-
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-lg mb-6">
-                {error}
+        {/* Stats */}
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl border border-gray-700/50">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-400">{users.length}</div>
+              <div className="text-gray-400 text-sm">Total Utilisateurs</div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl border border-gray-700/50">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-400">
+                {users.filter(u => u.status === "actif").length}
               </div>
-            )}
-
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-                <p className="text-gray-400 mt-4">Chargement des serveurs...</p>
+              <div className="text-gray-400 text-sm">Abonnés Actifs</div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl border border-gray-700/50">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-400">
+                {users.filter(u => u.status === "gratuit").length}
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {dnsServers.map(s => (
-                  <div key={s.ip} className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/30 hover:border-orange-500/50 transition-all duration-300">
-                    {editingIp === s.ip ? (
-                      <div className="space-y-3">
-                        <input
-                          type="text"
-                          value={editIp}
-                          onChange={e => setEditIp(e.target.value)}
-                          className="w-full border border-gray-600 bg-gray-700 text-white p-2 rounded-lg focus:border-orange-500 focus:outline-none"
-                        />
-                        <select
-                          value={editContinent}
-                          onChange={e => setEditContinent(e.target.value)}
-                          className="w-full border border-gray-600 bg-gray-700 text-white p-2 rounded-lg focus:border-orange-500 focus:outline-none"
-                        >
-                          {continents.map(c => <option key={c}>{c}</option>)}
-                        </select>
-                        <div className="flex gap-2">
-                          <button onClick={saveEditDns} className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 px-3 py-2 rounded-lg text-white text-sm font-medium transition-all duration-200">
-                            Enregistrer
+              <div className="text-gray-400 text-sm">Comptes Gratuits</div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl border border-gray-700/50">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-400">
+                {users.filter(u => u.role === "ADMIN").length}
+              </div>
+              <div className="text-gray-400 text-sm">Administrateurs</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Admin */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <Link href="/admin/ip-management">
+            <div className="bg-gradient-to-br from-blue-800/50 to-blue-900/50 p-6 rounded-xl border border-blue-700/50 hover:border-blue-600/70 transition-all cursor-pointer">
+              <div className="text-center">
+                <div className="text-4xl mb-3">🌐</div>
+                <div className="text-xl font-bold text-blue-400 mb-2">Gestion DNS</div>
+                <div className="text-gray-400 text-sm">IPs autorisées & logs Smart DNS</div>
+              </div>
+            </div>
+          </Link>
+          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 opacity-50">
+            <div className="text-center">
+              <div className="text-4xl mb-3">📊</div>
+              <div className="text-xl font-bold text-gray-400 mb-2">Analytics</div>
+              <div className="text-gray-500 text-sm">Bientôt disponible</div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 opacity-50">
+            <div className="text-center">
+              <div className="text-4xl mb-3">⚙️</div>
+              <div className="text-xl font-bold text-gray-400 mb-2">Paramètres</div>
+              <div className="text-gray-500 text-sm">Bientôt disponible</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Liste des utilisateurs */}
+        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 overflow-hidden">
+          <div className="p-6 border-b border-gray-700/50">
+            <h2 className="text-2xl font-bold text-white">Gestion des Utilisateurs</h2>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-900/50">
+                <tr>
+                  <th className="px-6 py-4 text-left text-gray-300 font-semibold">Email</th>
+                  <th className="px-6 py-4 text-left text-gray-300 font-semibold">Rôle</th>
+                  <th className="px-6 py-4 text-left text-gray-300 font-semibold">Status</th>
+                  <th className="px-6 py-4 text-left text-gray-300 font-semibold">Expiration</th>
+                  <th className="px-6 py-4 text-left text-gray-300 font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user, index) => (
+                  <tr key={user.id} className={`border-t border-gray-700/50 ${index % 2 === 0 ? 'bg-gray-800/30' : ''}`}>
+                    <td className="px-6 py-4">
+                      <div className="text-white font-medium">{user.email}</div>
+                      <div className="text-gray-400 text-sm">{user.id}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        user.role === "ADMIN" 
+                          ? "bg-purple-500/20 text-purple-400" 
+                          : "bg-gray-500/20 text-gray-400"
+                      }`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        user.status === "actif" 
+                          ? "bg-green-500/20 text-green-400" 
+                          : "bg-orange-500/20 text-orange-400"
+                      }`}>
+                        {user.status === "actif" ? "🟢 Premium" : "🟡 Gratuit"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-gray-300 text-sm">
+                        {user.subscriptionEnd 
+                          ? new Date(user.subscriptionEnd).toLocaleDateString("fr-FR")
+                          : "Aucune"
+                        }
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-2">
+                        {user.role !== "ADMIN" && (
+                          <button
+                            onClick={() => toggleSubscription(user.id, user.status)}
+                            disabled={actionLoading === user.id}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              user.status === "actif"
+                                ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                                : "bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                            } disabled:opacity-50`}
+                          >
+                            {actionLoading === user.id ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                            ) : user.status === "actif" ? (
+                              "Désactiver"
+                            ) : (
+                              "Activer"
+                            )}
                           </button>
-                          <button onClick={cancelEditDns} className="flex-1 bg-gray-600 hover:bg-gray-500 px-3 py-2 rounded-lg text-white text-sm font-medium transition-all duration-200">
-                            Annuler
+                        )}
+                        
+                        {user.role !== "ADMIN" && (
+                          <button
+                            onClick={() => deleteUser(user.id, user.email)}
+                            disabled={actionLoading === user.id}
+                            className="px-4 py-2 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                          >
+                            Supprimer
                           </button>
-                        </div>
+                        )}
+                        
+                        {user.role === "ADMIN" && (
+                          <span className="text-gray-500 text-sm">Administrateur</span>
+                        )}
                       </div>
-                    ) : (
-                      <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-orange-400 font-mono text-sm">{s.ip}</span>
-                          <div className="flex gap-2">
-                            <button onClick={() => startEditDns(s)} className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 px-3 py-1 rounded-lg text-white text-xs font-medium transition-all duration-200">
-                              Modifier
-                            </button>
-                            <button onClick={() => removeServer(s.ip)} className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 px-3 py-1 rounded-lg text-white text-xs font-medium transition-all duration-200">
-                              Supprimer
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                          <span className="text-gray-400 text-sm">{s.continent}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                    </td>
+                  </tr>
                 ))}
-              </div>
-            )}
+              </tbody>
+            </table>
           </div>
-        </section>
 
-        {/* Users Management Section */}
-        <section>
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-8">
-            <h2 className="text-3xl font-bold mb-6 text-center">
-              <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-                GESTION
-              </span>
-              <span className="text-white"> DES UTILISATEURS</span>
-            </h2>
+          {users.length === 0 && (
+            <div className="p-12 text-center">
+              <div className="text-gray-400 text-lg">Aucun utilisateur trouvé</div>
+            </div>
+          )}
+        </div>
 
-            {usersError && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-lg mb-6">
-                {usersError}
-              </div>
-            )}
-
-            {usersLoading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
-                <p className="text-gray-400 mt-4">Chargement des utilisateurs...</p>
-              </div>
-            ) : (
-              <div className="overflow-hidden rounded-xl border border-gray-700/30">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gradient-to-r from-gray-700 to-gray-800">
-                      <th className="p-4 text-left text-white font-bold">Email</th>
-                      <th className="p-4 text-left text-white font-bold">Statut</th>
-                      <th className="p-4 text-left text-white font-bold">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.length === 0 ? (
-                      <tr>
-                        <td colSpan={3} className="p-8 text-center text-gray-400">
-                          Aucun utilisateur trouvé
-                        </td>
-                      </tr>
-                    ) : (
-                      users.map(u => (
-                        <tr key={u.email} className="border-t border-gray-700/30 hover:bg-gray-800/30 transition-colors">
-                          <td className="p-4 text-white">{u.email}</td>
-                          <td className="p-4">
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              u.status === "actif" ? "bg-green-500/20 text-green-400" : 
-                              u.status === "expiré" ? "bg-red-500/20 text-red-400" : 
-                              "bg-gray-500/20 text-gray-400"
-                            }`}>
-                              {u.status}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <button 
-                              onClick={() => removeUser(u.email)} 
-                              className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 px-4 py-2 rounded-lg text-white text-sm font-medium transition-all duration-200"
-                            >
-                              Supprimer
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
+        {/* Instructions */}
+        <div className="mt-8 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-2xl p-6">
+          <h3 className="text-xl font-bold text-white mb-4">📋 Instructions Panel Admin</h3>
+          <div className="grid md:grid-cols-2 gap-6 text-gray-300">
+            <div>
+              <h4 className="font-semibold text-blue-400 mb-2">✅ Activer un abonnement :</h4>
+              <p className="text-sm">Cliquez sur "Activer" pour donner accès Premium à un utilisateur (durée : 30 jours).</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-red-400 mb-2">❌ Désactiver un abonnement :</h4>
+              <p className="text-sm">Cliquez sur "Désactiver" pour révoquer l'accès Premium immédiatement.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-orange-400 mb-2">🗑️ Supprimer un utilisateur :</h4>
+              <p className="text-sm">Supprime définitivement le compte et toutes ses données.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-purple-400 mb-2">👑 Comptes Admin :</h4>
+              <p className="text-sm">Les administrateurs ne peuvent pas être modifiés via cette interface.</p>
+            </div>
           </div>
-        </section>
+        </div>
       </div>
     </div>
   );
-} 
+}

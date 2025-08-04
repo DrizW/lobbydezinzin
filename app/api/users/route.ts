@@ -30,7 +30,9 @@ export async function GET() {
         id: user.id,
         email: user.email,
         role: user.role,
-        status: activeSubscription ? "actif" : "gratuit"
+        status: activeSubscription ? "actif" : "gratuit",
+        subscriptionId: activeSubscription?.id,
+        subscriptionEnd: activeSubscription?.currentPeriodEnd?.toISOString()
       };
     });
 

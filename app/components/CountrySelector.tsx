@@ -28,21 +28,38 @@ export default function CountrySelector() {
   const [loading, setLoading] = useState(true);
   const [dnsStatus, setDnsStatus] = useState<DNSStatus>({});
   const [testingAll, setTestingAll] = useState(false);
+  const [userIP, setUserIP] = useState<string>('');
+  const [showDNSConfig, setShowDNSConfig] = useState(false);
 
   useEffect(() => {
+    // Récupérer les pays
     fetch("/api/countries")
       .then(res => res.json())
       .then(data => {
-        setCountries(data);
+        // Gérer la nouvelle structure de l'API
+        const countriesArray = data.countries || data || [];
+        setCountries(countriesArray);
         setLoading(false);
         // Initialiser le statut DNS
         const initialStatus: DNSStatus = {};
-        data.forEach((country: Country) => {
+        countriesArray.forEach((country: Country) => {
           initialStatus[country.id] = 'unknown';
         });
         setDnsStatus(initialStatus);
       })
       .catch(() => setLoading(false));
+
+    // Récupérer l'IP de l'utilisateur
+    fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(data => setUserIP(data.ip))
+      .catch(() => {
+        // Fallback avec une autre API
+        fetch('https://ipapi.co/ip/')
+          .then(res => res.text())
+          .then(ip => setUserIP(ip.trim()))
+          .catch(() => setUserIP('IP non détectée'));
+      });
   }, []);
 
   const testDNS = async (country: Country) => {
@@ -249,7 +266,10 @@ export default function CountrySelector() {
             {countries.map((country) => (
             <div
               key={country.id}
-              onClick={() => setSelectedCountry(country)}
+              onClick={() => {
+                setSelectedCountry(country);
+                setShowDNSConfig(true);
+              }}
               className={`bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700/50 cursor-pointer transition-all duration-300 hover:border-orange-500/50 hover:scale-105 group relative ${
                 selectedCountry?.id === country.id ? "border-orange-500 ring-2 ring-orange-500/50" : ""
               }`}
@@ -315,97 +335,149 @@ export default function CountrySelector() {
          </div>
         )}
 
-        {/* Selected Country Details */}
-        {selectedCountry && (
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-8 mb-8">
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center space-x-4 mb-4">
-                <span className="text-4xl">{selectedCountry.flag}</span>
-                <h2 className="text-3xl font-bold text-white">{selectedCountry.name}</h2>
-              </div>
-              <p className="text-xl text-gray-300 mb-4">{selectedCountry.description}</p>
-              <div className={`text-3xl font-bold ${getKdColor(selectedCountry.kdValue)}`}>
-                KD: {selectedCountry.kdRange}
-              </div>
-            </div>
-
-            {/* DNS Configuration */}
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold text-white mb-4">Configuration DNS</h3>
-                <div className="space-y-3">
-                  <div className="bg-gray-800/50 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-gray-400 text-sm">DNS Principal</span>
-                      <button
-                        onClick={() => copyToClipboard(selectedCountry.dnsPrimary)}
-                        className="bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded text-white text-xs font-medium transition-colors"
-                      >
-                        Copier
-                      </button>
-                    </div>
-                    <div className="text-white font-mono text-lg">{selectedCountry.dnsPrimary}</div>
-                  </div>
-                  
-                  <div className="bg-gray-800/50 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-gray-400 text-sm">DNS Secondaire</span>
-                      <button
-                        onClick={() => copyToClipboard(selectedCountry.dnsSecondary)}
-                        className="bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded text-white text-xs font-medium transition-colors"
-                      >
-                        Copier
-                      </button>
-                    </div>
-                    <div className="text-white font-mono text-lg">{selectedCountry.dnsSecondary}</div>
+        {/* DNS Configuration Modal */}
+        {showDNSConfig && selectedCountry && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center space-x-4">
+                  <span className="text-4xl">{selectedCountry.flag}</span>
+                  <div>
+                    <h2 className="text-3xl font-bold text-white">{selectedCountry.name}</h2>
+                    <p className="text-gray-400">{selectedCountry.description}</p>
                   </div>
                 </div>
+                <button
+                  onClick={() => setShowDNSConfig(false)}
+                  className="text-gray-400 hover:text-white text-2xl"
+                >
+                  ×
+                </button>
               </div>
 
-              <div>
-                <h3 className="text-xl font-bold text-white mb-4">Tutoriels de Configuration</h3>
-                <div className="space-y-3">
-                  <button
-                    onClick={() => setShowTutorial('ps5')}
-                    className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 px-6 py-3 rounded-lg text-white font-bold transition-all duration-300"
-                  >
-                    📱 PS5 - Tutoriel
-                  </button>
-                  <button
-                    onClick={() => setShowTutorial('xbox')}
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 px-6 py-3 rounded-lg text-white font-bold transition-all duration-300"
-                  >
-                    🎮 Xbox - Tutoriel
-                  </button>
-                  <button
-                    onClick={() => setShowTutorial('pc')}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 px-6 py-3 rounded-lg text-white font-bold transition-all duration-300"
-                  >
-                    💻 PC - Tutoriel
-                  </button>
+              {/* Sécurité IP */}
+              <div className="bg-gradient-to-r from-red-900/20 to-orange-900/20 border border-red-500/30 rounded-lg p-4 mb-6">
+                <h3 className="font-bold text-red-400 mb-2">🔒 Sécurité par IP</h3>
+                <p className="text-gray-300 text-sm mb-2">
+                  Pour des raisons de sécurité, seule votre IP actuelle sera autorisée :
+                </p>
+                <div className="bg-gray-800/50 rounded-lg p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white font-mono text-lg">{userIP || 'Détection en cours...'}</span>
+                    <button
+                      onClick={() => copyToClipboard(userIP)}
+                      className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-white text-xs font-medium transition-colors"
+                    >
+                      Copier IP
+                    </button>
+                  </div>
                 </div>
+                <p className="text-red-300 text-xs mt-2">
+                  ⚠️ Si votre IP change, vous devrez revenir sur cette page pour la mettre à jour.
+                </p>
               </div>
-            </div>
 
-            {/* Quick Stats */}
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-gray-800/50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-green-400 mb-1">
-                  {Math.round((1 - selectedCountry.kdValue) * 100)}%
+              {/* DNS Configuration */}
+              <div className="grid md:grid-cols-2 gap-8 mb-8">
+                <div className="space-y-4">
+                  <h3 className="text-xl font-bold text-white mb-4">🌐 Configuration DNS</h3>
+                  <div className="space-y-3">
+                    <div className="bg-gray-800/50 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-gray-400 text-sm">DNS Principal</span>
+                        <button
+                          onClick={() => copyToClipboard(selectedCountry.dnsPrimary)}
+                          className="bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded text-white text-xs font-medium transition-colors"
+                        >
+                          Copier
+                        </button>
+                      </div>
+                      <div className="text-white font-mono text-lg">{selectedCountry.dnsPrimary}</div>
+                    </div>
+                    
+                    <div className="bg-gray-800/50 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-gray-400 text-sm">DNS Secondaire</span>
+                        <button
+                          onClick={() => copyToClipboard(selectedCountry.dnsSecondary)}
+                          className="bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded text-white text-xs font-medium transition-colors"
+                        >
+                          Copier
+                        </button>
+                      </div>
+                      <div className="text-white font-mono text-lg">{selectedCountry.dnsSecondary}</div>
+                    </div>
+
+                    <div className={`text-center p-4 rounded-lg ${getKdColor(selectedCountry.kdValue)} bg-gray-800/30`}>
+                      <div className="text-2xl font-bold">KD Moyen: {selectedCountry.kdRange}</div>
+                      <div className="text-sm opacity-75">
+                        {Math.round((1 - selectedCountry.kdValue) * 100)}% plus facile que la normale
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-400">Plus facile</div>
-              </div>
-              <div className="bg-gray-800/50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-blue-400 mb-1">
-                  {Math.round(selectedCountry.kdValue * 10)}/10
+
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-4">📋 Tutoriels Console</h3>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => setShowTutorial('ps5')}
+                      className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 px-6 py-3 rounded-lg text-white font-bold transition-all duration-300"
+                    >
+                      📱 PS5 - Configuration
+                    </button>
+                    <button
+                      onClick={() => setShowTutorial('xbox')}
+                      className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 px-6 py-3 rounded-lg text-white font-bold transition-all duration-300"
+                    >
+                      🎮 Xbox - Configuration
+                    </button>
+                    <button
+                      onClick={() => setShowTutorial('pc')}
+                      className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 px-6 py-3 rounded-lg text-white font-bold transition-all duration-300"
+                    >
+                      💻 PC - Configuration
+                    </button>
+                  </div>
+
+                  {/* Test DNS */}
+                  <div className="mt-6">
+                    <button
+                      onClick={() => testDNS(selectedCountry)}
+                      disabled={dnsStatus[selectedCountry.id] === 'testing'}
+                      className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:from-gray-600 disabled:to-gray-700 px-6 py-3 rounded-lg text-white font-bold transition-all duration-300"
+                    >
+                      {dnsStatus[selectedCountry.id] === 'testing' ? (
+                        <>
+                          <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Test en cours...
+                        </>
+                      ) : (
+                        <>
+                          🔍 Tester le DNS {selectedCountry.name}
+                        </>
+                      )}
+                    </button>
+                    
+                    {dnsStatus[selectedCountry.id] !== 'unknown' && (
+                      <div className={`mt-3 p-3 rounded-lg ${
+                        dnsStatus[selectedCountry.id] === 'online' 
+                          ? 'bg-green-900/20 border border-green-500/30' 
+                          : 'bg-red-900/20 border border-red-500/30'
+                      }`}>
+                        <p className={`text-sm ${
+                          dnsStatus[selectedCountry.id] === 'online' ? 'text-green-300' : 'text-red-300'
+                        }`}>
+                          {getStatusIcon(dnsStatus[selectedCountry.id])} {' '}
+                          {dnsStatus[selectedCountry.id] === 'online' 
+                            ? 'DNS opérationnel - Prêt à utiliser !' 
+                            : 'DNS hors ligne - Essayez un autre pays'
+                          }
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="text-sm text-gray-400">Difficulté</div>
-              </div>
-              <div className="bg-gray-800/50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-orange-400 mb-1">
-                  ⭐⭐⭐⭐⭐
-                </div>
-                <div className="text-sm text-gray-400">Recommandé</div>
               </div>
             </div>
           </div>
