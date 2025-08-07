@@ -312,7 +312,7 @@ export default function DashboardPage() {
           <div className="mt-8 p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl">
             <div className="flex items-center space-x-3 mb-4">
               <span className="text-2xl">✨</span>
-              <h4 className="text-xl font-bold text-white">Exactement comme NolagVPN !</h4>
+              <h4 className="text-xl font-bold text-white">Solution DNS Professionnelle !</h4>
             </div>
             <ul className="text-gray-300 space-y-2">
               <li className="flex items-center space-x-2">
