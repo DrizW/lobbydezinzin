@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 
-// Mapping des régions avec leurs informations
+// Mapping des régions avec leurs informations (5 régions DNS Geolocation)
 const REGIONS = {
   nigeria: {
     name: "Nigeria",
@@ -35,38 +35,6 @@ const REGIONS = {
     effectiveness: 88,
     description: "Très bon",
     color: "from-orange-400 to-red-500"
-  },
-  cambodia: {
-    name: "Cambodge",
-    flag: "🇰🇭",
-    kdRange: "0.9-1.2",
-    effectiveness: 85,
-    description: "Efficace",
-    color: "from-yellow-400 to-orange-500"
-  },
-  morocco: {
-    name: "Maroc",
-    flag: "🇲🇦",
-    kdRange: "0.9-1.3",
-    effectiveness: 82,
-    description: "Correct",
-    color: "from-red-400 to-pink-500"
-  },
-  algeria: {
-    name: "Algérie", 
-    flag: "🇩🇿",
-    kdRange: "1.0-1.3",
-    effectiveness: 80,
-    description: "Moyen",
-    color: "from-teal-400 to-green-500"
-  },
-  tunisia: {
-    name: "Tunisie",
-    flag: "🇹🇳",
-    kdRange: "1.0-1.4", 
-    effectiveness: 78,
-    description: "Basique",
-    color: "from-indigo-400 to-blue-500"
   },
   kenya: {
     name: "Kenya",
