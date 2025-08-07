@@ -28,13 +28,23 @@ const GEOLOCATION_DOMAINS = [
   'geolocation.call-of-duty.com',
   'region.battle.net',
   'location.blizzard.com'
-  // ❌ DOMAINES SUPPRIMÉS : Trop agressifs, cassent la connexion
+  // ❌ DOMAINES SUPPRIMÉS : Causent "échec de connexion"
   // 'ingest.datax.activision.com',   // ❌ Télémétrie (essentiel)
   // 'prod.cdni.callofduty.com',      // ❌ CDN (essentiel)
   // 'genesis.stun.us.demonware.net', // ❌ STUN (essentiel)
   // 'genesis.stun.eu.demonware.net', // ❌ STUN (essentiel)
   // 'cer-ps5-loginservice.prod.demonware.net', // ❌ Login (essentiel)
-  // 'lsg.7300.prod.demonware.net'    // ❌ Lobby (essentiel)
+  // 'lsg.7300.prod.demonware.net',   // ❌ Lobby (essentiel)
+  // 'api.callofduty.com',            // ❌ API (essentiel)
+  // 'geo.callofduty.com',            // ❌ API (essentiel)
+  // 'location.callofduty.com',       // ❌ API (essentiel)
+  // 'region.callofduty.com',         // ❌ API (essentiel)
+  // 'geo.battle.net',                // ❌ API (essentiel)
+  // 'location.battle.net',           // ❌ API (essentiel)
+  // 'region.battle.net',             // ❌ API (essentiel)
+  // 'geo.blizzard.com',              // ❌ API (essentiel)
+  // 'location.blizzard.com',         // ❌ API (essentiel)
+  // 'region.blizzard.com'            // ❌ API (essentiel)
 ];
 
 // 🎯 Mini VPS pour géolocalisation (512MB RAM suffisent)
@@ -228,13 +238,22 @@ async function handleDNSQuery(msg, rinfo) {
   const domain = query.name.toLowerCase();
   console.log(`📡 DNS Query: ${domain} from ${rinfo.address}`);
   
-  // 🔍 MODE SIMPLE : Seulement les domaines de géolocalisation connus
-  const isGeoLocationDomain = GEOLOCATION_DOMAINS.some(geoDomain => 
-    domain.includes(geoDomain)
-  );
+  // 🔍 MODE NOLAGVPN : Intercepter TOUS les domaines Call of Duty/Activision/Blizzard
+  const isCallOfDutyDomain = 
+    domain.includes('callofduty.com') ||
+    domain.includes('activision.com') ||
+    domain.includes('battle.net') ||
+    domain.includes('blizzard.com') ||
+    domain.includes('demonware.net') ||
+    domain.includes('cod-') ||
+    domain.includes('warzone') ||
+    domain.includes('geo') ||
+    domain.includes('location') ||
+    domain.includes('region') ||
+    domain.includes('telescope');
   
-  if (isGeoLocationDomain) {
-    console.log(`🌍 Géolocalisation détectée: ${domain}`);
+  if (isCallOfDutyDomain) {
+    console.log(`🎮 Call of Duty détecté: ${domain}`);
     
     // Récupérer l'utilisateur
     const user = await getUserByIP(rinfo.address);
@@ -252,7 +271,7 @@ async function handleDNSQuery(msg, rinfo) {
         server.send(response, rinfo.port, rinfo.address);
         
         // Log pour monitoring
-        console.log(`✅ Géolocalisation spoofée: ${user.email} → ${geolocator.country} (${geolocator.city})`);
+        console.log(`✅ Call of Duty spoofé: ${user.email} → ${geolocator.country} (${geolocator.city})`);
         return;
       }
     } else {
