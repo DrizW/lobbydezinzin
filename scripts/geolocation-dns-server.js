@@ -27,7 +27,14 @@ const GEOLOCATION_DOMAINS = [
   'location-api.battle.net',
   'geolocation.call-of-duty.com',
   'region.battle.net',
-  'location.blizzard.com'
+  'location.blizzard.com',
+  // 🔥 NOUVEAUX DOMAINES DÉTECTÉS DANS LES LOGS
+  'ingest.datax.activision.com',   // ✅ Télémétrie Activision
+  'prod.cdni.callofduty.com',      // ✅ CDN Call of Duty
+  'genesis.stun.us.demonware.net', // ✅ STUN US
+  'genesis.stun.eu.demonware.net', // ✅ STUN EU
+  'cer-ps5-loginservice.prod.demonware.net', // ✅ Login PS5
+  'lsg.7300.prod.demonware.net'    // ✅ Lobby Service
 ];
 
 // 🎯 Mini VPS pour géolocalisation (512MB RAM suffisent)
