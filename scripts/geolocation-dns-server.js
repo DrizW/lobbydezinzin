@@ -21,6 +21,7 @@ const GEOLOCATION_DOMAINS = [
   'telescope.battle.net',
   'telescope.callofduty.com',      // ✅ Domaine réel utilisé par PS5
   'telescope-api.callofduty.com',  // ✅ Domaine API réel
+  'cod-assets.cdn.callofduty.com', // ✅ Nouveau domaine détecté !
   'geoip.battle.net', 
   'geo.activision.com',
   'location-api.battle.net',
@@ -223,7 +224,7 @@ async function handleDNSQuery(msg, rinfo) {
   // 🔍 Vérifier si c'est un domaine de géolocalisation
   const isGeoLocationDomain = GEOLOCATION_DOMAINS.some(geoDomain => 
     domain.includes(geoDomain)
-  );
+  ) || domain.includes('callofduty.com') || domain.includes('activision.com');
   
   if (isGeoLocationDomain) {
     console.log(`🌍 Géolocalisation détectée: ${domain}`);
