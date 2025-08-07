@@ -149,12 +149,15 @@ async function getUserByIP(clientIP) {
     // TODO: Implémenter mapping IP → User via sessions/cookies
     const users = await prisma.user.findMany({
       where: {
-        subscription: {
-          type: 'PREMIUM'
+        subscriptions: {
+          some: {
+            type: 'PREMIUM',
+            isActive: true
+          }
         }
       },
       include: {
-        subscription: true
+        subscriptions: true
       }
     });
     
@@ -226,7 +229,8 @@ async function handleDNSQuery(msg, rinfo) {
     // Récupérer l'utilisateur
     const user = await getUserByIP(rinfo.address);
     
-    if (user?.subscription?.type === 'PREMIUM') {
+    const hasPremiumSubscription = user?.subscriptions?.some(sub => sub.type === 'PREMIUM' && sub.isActive);
+    if (hasPremiumSubscription) {
       // Utilisateur Premium → Géolocalisation personnalisée
       const selectedRegion = user.selectedCountry || 'nigeria';
       const geolocator = REGION_GEOLOCATORS[selectedRegion];

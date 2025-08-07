@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     // Récupérer l'utilisateur
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { subscription: true }
+      include: { subscriptions: true }
     });
 
     if (!user) {
@@ -80,7 +80,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier l'abonnement Premium pour le geolocation spoofing
-    if (user.subscription?.type !== 'PREMIUM') {
+    const hasPremiumSubscription = user.subscriptions?.some(sub => sub.type === 'PREMIUM' && sub.isActive);
+    if (!hasPremiumSubscription) {
       return NextResponse.json(
         { error: 'Abonnement Premium requis pour changer de région' },
         { status: 403 }
@@ -147,7 +148,7 @@ export async function GET(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { subscription: true }
+      include: { subscriptions: true }
     });
 
     if (!user) {
@@ -165,7 +166,7 @@ export async function GET(request: NextRequest) {
       regionName: regionConfig?.name || 'Nigeria',
       country: regionConfig?.country || 'NG',
       geoIP: regionConfig?.geoIP || '41.223.84.20',
-      isPremium: user.subscription?.type === 'PREMIUM',
+      isPremium: user.subscriptions?.some(sub => sub.type === 'PREMIUM' && sub.isActive) || false,
       lastUpdated: user.lastUpdated
     });
 
