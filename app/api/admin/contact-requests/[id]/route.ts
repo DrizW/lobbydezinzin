@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function PATCH(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -17,7 +17,7 @@ export async function PATCH(
     }
 
     const { status } = await request.json();
-    const { id } = context.params;
+    const { id } = params;
 
     const updatedRequest = await prisma.contactRequest.update({
       where: { id },
@@ -30,33 +30,6 @@ export async function PATCH(
     return NextResponse.json(updatedRequest);
   } catch (error) {
     console.error('Erreur mise à jour demande contact:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session || session.user?.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
-    }
-
-    const { id } = context.params;
-
-    await prisma.contactRequest.delete({
-      where: { id }
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Erreur suppression demande contact:', error);
     return NextResponse.json(
       { error: 'Erreur serveur' },
       { status: 500 }
