@@ -34,16 +34,13 @@ const faqs = [
     id: 3,
     category: "Configuration",
     question: "Comment configurer le DNS sur PC Windows ?",
-    answer: `1. Clic droit sur l'icône réseau dans la barre des tâches
-2. Sélectionnez **Ouvrir les paramètres réseau et Internet**
-3. Cliquez sur **Modifier les options d'adaptateur**
-4. Clic droit sur votre connexion > **Propriétés**
-5. Sélectionnez **Protocole Internet version 4 (TCP/IPv4)**
-6. Cliquez sur **Propriétés**
-7. Cochez **Utiliser les adresses de serveur DNS suivantes**
-8. DNS préféré : **192.168.1.31**
-9. DNS auxiliaire : **8.8.8.8**
-10. Cliquez sur **OK**`
+    answer: `**Configuration rapide :**
+
+1. Paramètres > Réseau et Internet > Modifier les options d'adaptateur
+2. Clic droit sur votre connexion > Propriétés
+3. Sélectionnez **TCP/IPv4** > Propriétés
+4. DNS préféré : **192.168.1.31**
+5. DNS auxiliaire : **8.8.8.8**`
   },
   {
     id: 4,
@@ -61,21 +58,8 @@ const faqs = [
     id: 5,
     category: "Fonctionnement",
     question: "Quelle est la différence avec un VPN classique ?",
-    answer: `**Smart DNS LobbyDeZinzin** vs **VPN classique** :
-
-✅ **Smart DNS** :
-- Pas de perte de vitesse
-- Ping optimal conservé
-- Seul Call of Duty est redirigé
-- Configuration simple sur console
-- Changement instantané de région
-
-❌ **VPN classique** :
-- Ralentit votre connexion
-- Augmente le ping
-- Tout le trafic est redirigé
-- Difficile à configurer sur console
-- Souvent détecté et bloqué`
+    answer: `**Smart DNS** : Ping optimal, seul Call of Duty redirigé, configuration simple
+**VPN classique** : Ralentit la connexion, tout le trafic redirigé, souvent détecté`
   },
   {
     id: 6,
@@ -122,15 +106,7 @@ const faqs = [
     id: 9,
     category: "Problèmes",
     question: "Mon ping est-il affecté ?",
-    answer: `**Non, votre ping reste optimal !**
-
-Notre Smart DNS ne redirige que la **résolution des noms de serveurs**. Une fois connecté au serveur de jeu, votre trafic passe directement sans intermédiaire.
-
-**Résultat** :
-- Ping identique à une connexion normale
-- Vitesse de téléchargement conservée
-- Latence minimale
-- Expérience de jeu fluide`
+    answer: `**Non !** Le Smart DNS ne redirige que la résolution DNS. Votre ping reste identique à une connexion normale.`
   },
   {
     id: 10,

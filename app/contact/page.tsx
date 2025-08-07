@@ -17,12 +17,27 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simuler l'envoi (à remplacer par votre API)
-    setTimeout(() => {
-      setSubmitStatus("success");
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setSubmitStatus("success");
+        setFormData({ name: "", email: "", subject: "", message: "", priority: "normal" });
+      } else {
+        setSubmitStatus("error");
+      }
+    } catch (error) {
+      console.error("Erreur envoi contact:", error);
+      setSubmitStatus("error");
+    } finally {
       setIsSubmitting(false);
-      setFormData({ name: "", email: "", subject: "", message: "", priority: "normal" });
-    }, 2000);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

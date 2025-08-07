@@ -183,13 +183,15 @@ export default function AdminPage() {
               </div>
             </div>
           </Link>
-          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 opacity-50">
-            <div className="text-center">
-              <div className="text-4xl mb-3">📊</div>
-              <div className="text-xl font-bold text-gray-400 mb-2">Analytics</div>
-              <div className="text-gray-500 text-sm">Bientôt disponible</div>
+          <Link href="/admin/contact-requests">
+            <div className="bg-gradient-to-br from-purple-800/50 to-purple-900/50 p-6 rounded-xl border border-purple-700/50 hover:border-purple-600/70 transition-all cursor-pointer">
+              <div className="text-center">
+                <div className="text-4xl mb-3">💬</div>
+                <div className="text-xl font-bold text-purple-400 mb-2">Support</div>
+                <div className="text-gray-400 text-sm">Demandes de contact</div>
+              </div>
             </div>
-          </div>
+          </Link>
           <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 opacity-50">
             <div className="text-center">
               <div className="text-4xl mb-3">⚙️</div>

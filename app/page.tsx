@@ -1,7 +1,11 @@
+"use client";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import Logo from "./components/Logo";
 
 export default function HomePage() {
+  const { data: session } = useSession();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       {/* Hero Section */}
@@ -31,9 +35,9 @@ export default function HomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href="/register">
+              <Link href={session ? "/dashboard" : "/register"}>
                 <button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-8 py-4 rounded-xl text-white font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-orange-500/25 transform hover:scale-105">
-                  Commencer Maintenant
+                  {session ? "Accéder au Dashboard" : "Commencer Maintenant"}
                 </button>
               </Link>
               <Link href="/#features">
