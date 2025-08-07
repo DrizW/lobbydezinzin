@@ -69,7 +69,10 @@ export async function POST(request: NextRequest) {
     // Récupérer l'utilisateur
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { subscriptions: true }
+      include: { 
+        subscriptions: true,
+        settings: true 
+      }
     });
 
     if (!user) {
@@ -80,7 +83,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier l'abonnement Premium pour le geolocation spoofing
-    const hasPremiumSubscription = user.subscriptions?.some(sub => sub.type === 'PREMIUM' && sub.isActive);
+    const hasPremiumSubscription = user.subscriptions?.some(sub => sub.status === 'active');
     if (!hasPremiumSubscription) {
       return NextResponse.json(
         { error: 'Abonnement Premium requis pour changer de région' },
@@ -91,10 +94,15 @@ export async function POST(request: NextRequest) {
     // Mettre à jour les paramètres DNS de l'utilisateur
     const regionConfig = REGION_MAPPING[region as keyof typeof REGION_MAPPING];
     
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        // Stocker la région sélectionnée pour le DNS server
+    // Créer ou mettre à jour les settings utilisateur
+    await prisma.userSettings.upsert({
+      where: { userId: user.id },
+      create: {
+        userId: user.id,
+        selectedCountry: region,
+        autoRotate: false
+      },
+      update: {
         selectedCountry: region,
         lastUpdated: new Date()
       }
@@ -148,7 +156,10 @@ export async function GET(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { subscriptions: true }
+      include: { 
+        subscriptions: true,
+        settings: true 
+      }
     });
 
     if (!user) {
@@ -158,7 +169,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const currentRegion = user.selectedCountry || 'nigeria';
+    const currentRegion = user.settings?.selectedCountry || 'nigeria';
     const regionConfig = REGION_MAPPING[currentRegion as keyof typeof REGION_MAPPING];
 
     return NextResponse.json({
@@ -166,8 +177,8 @@ export async function GET(request: NextRequest) {
       regionName: regionConfig?.name || 'Nigeria',
       country: regionConfig?.country || 'NG',
       geoIP: regionConfig?.geoIP || '41.223.84.20',
-      isPremium: user.subscriptions?.some(sub => sub.type === 'PREMIUM' && sub.isActive) || false,
-      lastUpdated: user.lastUpdated
+      isPremium: user.subscriptions?.some(sub => sub.status === 'active') || false,
+      lastUpdated: user.settings?.lastUpdated
     });
 
   } catch (error) {

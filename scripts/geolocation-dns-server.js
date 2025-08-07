@@ -151,13 +151,13 @@ async function getUserByIP(clientIP) {
       where: {
         subscriptions: {
           some: {
-            type: 'PREMIUM',
-            isActive: true
+            status: 'active'
           }
         }
       },
       include: {
-        subscriptions: true
+        subscriptions: true,
+        settings: true
       }
     });
     
@@ -229,10 +229,10 @@ async function handleDNSQuery(msg, rinfo) {
     // Récupérer l'utilisateur
     const user = await getUserByIP(rinfo.address);
     
-    const hasPremiumSubscription = user?.subscriptions?.some(sub => sub.type === 'PREMIUM' && sub.isActive);
+    const hasPremiumSubscription = user?.subscriptions?.some(sub => sub.status === 'active');
     if (hasPremiumSubscription) {
       // Utilisateur Premium → Géolocalisation personnalisée
-      const selectedRegion = user.selectedCountry || 'nigeria';
+      const selectedRegion = user.settings?.selectedCountry || 'nigeria';
       const geolocator = REGION_GEOLOCATORS[selectedRegion];
       
       if (geolocator) {
