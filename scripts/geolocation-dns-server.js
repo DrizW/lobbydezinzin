@@ -221,10 +221,28 @@ async function handleDNSQuery(msg, rinfo) {
   const domain = query.name.toLowerCase();
   console.log(`📡 DNS Query: ${domain} from ${rinfo.address}`);
   
-  // 🔍 Vérifier si c'est un domaine de géolocalisation
-  const isGeoLocationDomain = GEOLOCATION_DOMAINS.some(geoDomain => 
-    domain.includes(geoDomain)
-  ) || domain.includes('callofduty.com') || domain.includes('activision.com');
+  // 🔍 MODE AGRESSIF : Intercepter TOUS les domaines sauf les essentiels (comme NolagVPN)
+  const essentialDomains = [
+    'playstation.', 'xbox.', 'microsoft.', 'google.', 'youtube.', 'netflix.',
+    'amazon.', 'facebook.', 'instagram.', 'twitter.', 'github.', 'discord.'
+  ];
+  
+  const isEssentialDomain = essentialDomains.some(essential => domain.includes(essential));
+  
+  // Si c'est un domaine gaming/réseau ET pas essentiel → INTERCEPTER
+  const isGeoLocationDomain = !isEssentialDomain && (
+    GEOLOCATION_DOMAINS.some(geoDomain => domain.includes(geoDomain))
+    || domain.includes('callofduty.com') 
+    || domain.includes('activision.com')
+    || domain.includes('battle.net')
+    || domain.includes('blizzard.com')
+    || domain.includes('cod-')
+    || domain.includes('warzone')
+    || domain.includes('demonware')
+    || domain.includes('geoip')
+    || domain.includes('location')
+    || domain.includes('region')
+  );
   
   if (isGeoLocationDomain) {
     console.log(`🌍 Géolocalisation détectée: ${domain}`);
