@@ -258,9 +258,9 @@ export default function CountriesPage() {
               <p className="text-gray-300 mb-6">
                 Notre équipe support est là pour vous aider à optimiser votre expérience Warzone
               </p>
-              <button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8 py-4 rounded-xl text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
+              <a href="/contact" className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8 py-4 rounded-xl text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
                 Contacter le Support
-              </button>
+              </a>
             </div>
           </div>
         </div>
