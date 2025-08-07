@@ -19,6 +19,8 @@ const server = dgram.createSocket('udp4');
 // 🌍 Configuration des domaines de géolocalisation Call of Duty
 const GEOLOCATION_DOMAINS = [
   'telescope.battle.net',
+  'telescope.callofduty.com',      // ✅ Domaine réel utilisé par PS5
+  'telescope-api.callofduty.com',  // ✅ Domaine API réel
   'geoip.battle.net', 
   'geo.activision.com',
   'location-api.battle.net',
