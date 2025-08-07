@@ -238,22 +238,13 @@ async function handleDNSQuery(msg, rinfo) {
   const domain = query.name.toLowerCase();
   console.log(`📡 DNS Query: ${domain} from ${rinfo.address}`);
   
-  // 🔍 MODE NOLAGVPN : Intercepter TOUS les domaines Call of Duty/Activision/Blizzard
-  const isCallOfDutyDomain = 
-    domain.includes('callofduty.com') ||
-    domain.includes('activision.com') ||
-    domain.includes('battle.net') ||
-    domain.includes('blizzard.com') ||
-    domain.includes('demonware.net') ||
-    domain.includes('cod-') ||
-    domain.includes('warzone') ||
-    domain.includes('geo') ||
-    domain.includes('location') ||
-    domain.includes('region') ||
-    domain.includes('telescope');
+  // 🔍 MODE SIMPLE : Seulement les domaines de géolocalisation connus
+  const isGeoLocationDomain = GEOLOCATION_DOMAINS.some(geoDomain => 
+    domain.includes(geoDomain)
+  );
   
-  if (isCallOfDutyDomain) {
-    console.log(`🎮 Call of Duty détecté: ${domain}`);
+  if (isGeoLocationDomain) {
+    console.log(`🌍 Géolocalisation détectée: ${domain}`);
     
     // Récupérer l'utilisateur
     const user = await getUserByIP(rinfo.address);
@@ -271,7 +262,7 @@ async function handleDNSQuery(msg, rinfo) {
         server.send(response, rinfo.port, rinfo.address);
         
         // Log pour monitoring
-        console.log(`✅ Call of Duty spoofé: ${user.email} → ${geolocator.country} (${geolocator.city})`);
+        console.log(`✅ Géolocalisation spoofée: ${user.email} → ${geolocator.country} (${geolocator.city})`);
         return;
       }
     } else {
