@@ -1,10 +1,49 @@
 "use client";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import Logo from "./components/Logo";
 
 export default function HomePage() {
   const { data: session } = useSession();
+  const [userStatus, setUserStatus] = useState<"loading" | "free" | "premium">("loading");
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      // Vérifier le statut d'abonnement
+      fetch("/api/subscription/check")
+        .then(res => res.json())
+        .then(data => {
+          setUserStatus(data.hasActiveSubscription ? "premium" : "free");
+        })
+        .catch(() => setUserStatus("free"));
+    } else if (session === null) {
+      setUserStatus("free");
+    }
+  }, [session]);
+
+  const getButtonProps = () => {
+    if (!session) {
+      return {
+        href: "/register",
+        text: "Commencer Maintenant"
+      };
+    }
+    
+    if (userStatus === "premium") {
+      return {
+        href: "/dashboard",
+        text: "Accéder au Dashboard"
+      };
+    }
+    
+    return {
+      href: "/subscription",
+      text: "Passer Premium"
+    };
+  };
+
+  const buttonProps = getButtonProps();
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
@@ -35,9 +74,9 @@ export default function HomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href={session ? "/dashboard" : "/register"}>
+              <Link href={buttonProps.href}>
                 <button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-8 py-4 rounded-xl text-white font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-orange-500/25 transform hover:scale-105">
-                  {session ? "Accéder au Dashboard" : "Commencer Maintenant"}
+                  {buttonProps.text}
                 </button>
               </Link>
               <Link href="/#features">
@@ -154,25 +193,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-gray-900 to-gray-800">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-              PRÊT À
-            </span>
-            <span className="text-white"> JOUER FACILE ?</span>
-          </h2>
-          <p className="text-xl text-gray-300 mb-8">
-            Rejoignez des milliers de joueurs qui ont déjà contourné le SBMM
-          </p>
-          <Link href="/register">
-            <button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-10 py-4 rounded-xl text-white font-bold text-xl transition-all duration-300 shadow-2xl hover:shadow-orange-500/25 transform hover:scale-105">
-              Commencer Gratuitement
-            </button>
-          </Link>
-        </div>
-      </section>
+      {/* CTA Section - Only show for non-logged users */}
+      {!session && (
+        <section className="py-20 bg-gradient-to-r from-gray-900 to-gray-800">
+          <div className="max-w-4xl mx-auto px-6 text-center">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+                PRÊT À
+              </span>
+              <span className="text-white"> JOUER FACILE ?</span>
+            </h2>
+            <p className="text-xl text-gray-300 mb-8">
+              Rejoignez des milliers de joueurs qui ont déjà contourné le SBMM
+            </p>
+            <Link href="/register">
+              <button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-10 py-4 rounded-xl text-white font-bold text-xl transition-all duration-300 shadow-2xl hover:shadow-orange-500/25 transform hover:scale-105">
+                Commencer Gratuitement
+              </button>
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   );
 } 

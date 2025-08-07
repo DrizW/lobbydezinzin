@@ -56,9 +56,9 @@ export default function ContactPage() {
             <div className="text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                  Support
+                  Assistance
                 </span>
-                <span className="text-white"> & Contact</span>
+                <span className="text-white"> Technique</span>
               </h1>
               <p className="text-xl text-gray-300 max-w-2xl mx-auto">
                 Notre équipe est là pour vous aider à optimiser votre expérience LobbyDeZinzin
@@ -72,7 +72,7 @@ export default function ContactPage() {
             {/* Contact Form */}
             <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl border border-gray-700/50 p-8">
               <h2 className="text-2xl font-bold text-white mb-6">
-                Contactez notre équipe
+                Ticket de Support
               </h2>
               
               {submitStatus === "success" ? (
@@ -82,15 +82,15 @@ export default function ContactPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Message envoyé !</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">Ticket créé avec succès !</h3>
                   <p className="text-gray-300">
-                    Nous vous répondrons dans les plus brefs délais.
+                    Notre équipe technique vous répondra sous 24h.
                   </p>
                   <button 
                     onClick={() => setSubmitStatus("idle")}
                     className="mt-4 text-blue-400 hover:text-blue-300 transition-colors"
                   >
-                    Envoyer un autre message
+                    Créer un nouveau ticket
                   </button>
                 </div>
               ) : (
@@ -185,7 +185,7 @@ export default function ContactPage() {
                         <span>Envoi en cours...</span>
                       </div>
                     ) : (
-                      "Envoyer le message"
+                      "Créer le ticket"
                     )}
                   </button>
                 </form>
@@ -197,7 +197,7 @@ export default function ContactPage() {
               {/* Quick Support */}
               <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-2xl p-8">
                 <h3 className="text-2xl font-bold text-white mb-6">
-                  Support Rapide
+                  Support Technique
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-4">

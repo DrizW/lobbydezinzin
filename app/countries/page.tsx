@@ -45,12 +45,12 @@ const faqs = [
   {
     id: 4,
     category: "Fonctionnement",
-    question: "Comment fonctionne le Smart DNS LobbyDeZinzin ?",
-    answer: `Notre Smart DNS fonctionne en **3 étapes simples** :
+    question: "Comment fonctionne LobbyDeZinzin ?",
+    answer: `Notre système fonctionne en **3 étapes simples** :
 
-1. **Identification** : Votre IP publique est automatiquement détectée
-2. **Redirection** : Selon votre région choisie sur le site, nous redirigeons les requêtes DNS de Call of Duty vers les serveurs de la région sélectionnée
-3. **Connexion** : Warzone pense que vous êtes dans cette région et vous connecte aux lobbies locaux
+1. **Détection** : Votre connexion est automatiquement détectée
+2. **Redirection** : Selon votre région choisie, nous dirigeons Call of Duty vers les serveurs de cette région
+3. **Connexion** : Warzone vous connecte aux lobbies de la région sélectionnée
 
 **Résultat** : Des lobbies plus faciles avec des joueurs moins expérimentés !`
   },
@@ -58,7 +58,7 @@ const faqs = [
     id: 5,
     category: "Fonctionnement",
     question: "Quelle est la différence avec un VPN classique ?",
-    answer: `**Smart DNS** : Ping optimal, seul Call of Duty redirigé, configuration simple
+    answer: `**LobbyDeZinzin** : Ping optimal, seul Call of Duty redirigé, configuration simple
 **VPN classique** : Ralentit la connexion, tout le trafic redirigé, souvent détecté`
   },
   {
@@ -106,7 +106,7 @@ const faqs = [
     id: 9,
     category: "Problèmes",
     question: "Mon ping est-il affecté ?",
-    answer: `**Non !** Le Smart DNS ne redirige que la résolution DNS. Votre ping reste identique à une connexion normale.`
+    answer: `**Non !** Notre système ne redirige que les connexions de jeu. Votre ping reste identique à une connexion normale.`
   },
   {
     id: 10,

@@ -33,10 +33,41 @@ export default function DashboardPage() {
   const [requiresSubscription, setRequiresSubscription] = useState(false);
   const [accessMessage, setAccessMessage] = useState<string>("");
   const [currentRegion, setCurrentRegion] = useState<string>("nigeria");
+  const [regionStats, setRegionStats] = useState({
+    name: "Nigeria",
+    flag: "🇳🇬",
+    kdAverage: 0.75,
+    lobbiesTested: 24,
+    kdRange: "0.6-0.9",
+    timezone: "Africa/Lagos",
+    localTime: "12:00"
+  });
 
   useEffect(() => {
     checkAccess();
-  }, []);
+    loadUserRegion();
+    
+    // Mettre à jour l'heure toutes les minutes
+    const timeInterval = setInterval(() => {
+      updateRegionStats(currentRegion);
+    }, 60000); // 60 secondes
+
+    return () => clearInterval(timeInterval);
+  }, [currentRegion]);
+
+  const loadUserRegion = async () => {
+    try {
+      const response = await fetch("/api/user/settings");
+      if (response.ok) {
+        const data = await response.json();
+        const userRegion = data.selectedCountry || "nigeria";
+        setCurrentRegion(userRegion);
+        updateRegionStats(userRegion);
+      }
+    } catch (error) {
+      console.error("Erreur chargement région:", error);
+    }
+  };
 
   const checkAccess = async () => {
     try {
@@ -63,6 +94,53 @@ export default function DashboardPage() {
 
   const handleRegionChange = (region: string) => {
     setCurrentRegion(region);
+    updateRegionStats(region);
+  };
+
+  const updateRegionStats = (region: string) => {
+    const regionData = {
+      nigeria: { name: "Nigeria", flag: "🇳🇬", kdAverage: 0.75, lobbiesTested: 24, kdRange: "0.6-0.9", timezone: "Africa/Lagos" },
+      taiwan: { name: "Taiwan", flag: "🇹🇼", kdAverage: 0.85, lobbiesTested: 18, kdRange: "0.7-1.0", timezone: "Asia/Taipei" },
+      morocco: { name: "Maroc", flag: "🇲🇦", kdAverage: 0.95, lobbiesTested: 21, kdRange: "0.8-1.1", timezone: "Africa/Casablanca" },
+      thailand: { name: "Thaïlande", flag: "🇹🇭", kdAverage: 1.0, lobbiesTested: 15, kdRange: "0.8-1.2", timezone: "Asia/Bangkok" },
+      kenya: { name: "Kenya", flag: "🇰🇪", kdAverage: 1.05, lobbiesTested: 17, kdRange: "0.9-1.2", timezone: "Africa/Nairobi" },
+      cambodia: { name: "Cambodge", flag: "🇰🇭", kdAverage: 1.1, lobbiesTested: 12, kdRange: "0.9-1.2", timezone: "Asia/Phnom_Penh" },
+      algeria: { name: "Algérie", flag: "🇩🇿", kdAverage: 1.15, lobbiesTested: 14, kdRange: "1.0-1.3", timezone: "Africa/Algiers" },
+      tunisia: { name: "Tunisie", flag: "🇹🇳", kdAverage: 1.2, lobbiesTested: 11, kdRange: "1.0-1.4", timezone: "Africa/Tunis" }
+    };
+
+    const stats = regionData[region as keyof typeof regionData] || regionData.nigeria;
+    setRegionStats({ ...stats, localTime: getLocalTime(stats.timezone) });
+  };
+
+  const getLocalTime = (timezone: string) => {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: timezone,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+    return formatter.format(now);
+  };
+
+  const getTimeStatus = (timezone: string) => {
+    const now = new Date();
+    const hour = parseInt(now.toLocaleString('en-US', { 
+      timeZone: timezone, 
+      hour12: false, 
+      hour: '2-digit' 
+    }));
+    
+    if (hour >= 6 && hour <= 10) {
+      return { text: "Optimal (Matin)", color: "text-green-400", icon: "🌅" };
+    } else if (hour >= 11 && hour <= 15) {
+      return { text: "Bon (Midi)", color: "text-yellow-400", icon: "☀️" };
+    } else if (hour >= 16 && hour <= 21) {
+      return { text: "Moyen (Soir)", color: "text-orange-400", icon: "🌆" };
+    } else {
+      return { text: "Difficile (Nuit)", color: "text-red-400", icon: "🌙" };
+    }
   };
 
   const getKdColor = (kd: number) => {
@@ -115,10 +193,17 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Pays Actuel</p>
-                <p className="text-2xl font-bold text-green-400">Nigeria</p>
+                <p className="text-2xl font-bold text-green-400">{regionStats.name}</p>
+                <div className="flex items-center space-x-2 mt-1">
+                  <p className="text-sm text-gray-500">🕐 {regionStats.localTime}</p>
+                  <span className="text-xs">•</span>
+                  <p className={`text-xs font-medium ${getTimeStatus(regionStats.timezone).color}`}>
+                    {getTimeStatus(regionStats.timezone).icon} {getTimeStatus(regionStats.timezone).text}
+                  </p>
+                </div>
               </div>
               <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">🇳🇬</span>
+                <span className="text-white font-bold text-lg">{regionStats.flag}</span>
               </div>
             </div>
           </div>
@@ -127,7 +212,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">KD Moyen</p>
-                <p className="text-2xl font-bold text-blue-400">0.75</p>
+                <p className={`text-2xl font-bold ${getKdColor(regionStats.kdAverage)}`}>{regionStats.kdAverage}</p>
               </div>
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +226,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Lobbies Testés</p>
-                <p className="text-2xl font-bold text-orange-400">24</p>
+                <p className="text-2xl font-bold text-orange-400">{regionStats.lobbiesTested}</p>
               </div>
               <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,7 +397,7 @@ export default function DashboardPage() {
           <div className="mt-8 p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl">
             <div className="flex items-center space-x-3 mb-4">
               <span className="text-2xl">✨</span>
-              <h4 className="text-xl font-bold text-white">Exactement comme NolagVPN !</h4>
+              <h4 className="text-xl font-bold text-white">Fonctionnement Ultra-Simple !</h4>
             </div>
             <ul className="text-gray-300 space-y-2">
               <li className="flex items-center space-x-2">

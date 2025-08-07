@@ -20,9 +20,9 @@ const REGIONS = {
     description: "Très efficace",
     color: "from-blue-400 to-cyan-500"
   },
-  israel: {
-    name: "Israël",
-    flag: "🇮🇱", 
+  morocco: {
+    name: "Maroc",
+    flag: "🇲🇦", 
     kdRange: "0.8-1.1",
     effectiveness: 90,
     description: "Excellent choix",
@@ -71,10 +71,10 @@ const REGIONS = {
   kenya: {
     name: "Kenya",
     flag: "🇰🇪",
-    kdRange: "1.1-1.4",
-    effectiveness: 75,
-    description: "Limité",
-    color: "from-gray-400 to-gray-600"
+    kdRange: "0.9-1.2",
+    effectiveness: 85,
+    description: "Très bon",
+    color: "from-orange-400 to-yellow-500"
   }
 };
 
@@ -139,8 +139,8 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
         // Callback pour notifier le parent
         onRegionChange?.(regionKey);
         
-        // Notification succès
-        showNotification(`Région changée vers ${REGIONS[regionKey].name}`, "success");
+        // Notification succès avec info geolocation spoofing
+        showNotification(`🎯 ${REGIONS[regionKey].name} ${REGIONS[regionKey].flag} activé ! Géolocalisation spoofée, ping optimal maintenu.`, "success");
       } else {
         const error = await response.json();
         showNotification(error.error || "Erreur lors du changement", "error");
@@ -258,8 +258,8 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
       <div className="border-t border-gray-700/50 pt-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h4 className="text-white font-medium">Rotation Automatique</h4>
-            <p className="text-gray-400 text-sm">Change de région automatiquement toutes les heures</p>
+            <h4 className="text-white font-medium">Rotation Intelligente</h4>
+            <p className="text-gray-400 text-sm">Optimise la région selon l'heure locale (lobbies plus faciles le matin)</p>
           </div>
           <button
             onClick={() => setAutoRotate(!autoRotate)}
@@ -275,8 +275,10 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
 
         {/* Informations de statut */}
         <div className="text-xs text-gray-500 space-y-1">
-          <div>💡 Configurez une seule fois: <code className="bg-gray-700 px-2 py-1 rounded">YOUR_DNS_IP</code></div>
           {lastUpdated && <div>🕐 Dernière mise à jour: {lastUpdated}</div>}
+          {autoRotate && (
+            <div className="text-orange-400">🔄 Rotation active - Optimisée pour les heures creuses (6h-10h locale)</div>
+          )}
         </div>
       </div>
     </div>
