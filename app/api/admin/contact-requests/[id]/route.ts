@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -17,6 +17,7 @@ export async function PATCH(
     }
 
     const { status } = await request.json();
+    const params = await context.params;
     const { id } = params;
 
     const updatedRequest = await prisma.contactRequest.update({
