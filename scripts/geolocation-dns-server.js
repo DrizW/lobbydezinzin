@@ -221,15 +221,10 @@ async function handleDNSQuery(msg, rinfo) {
   const domain = query.name.toLowerCase();
   console.log(`📡 DNS Query: ${domain} from ${rinfo.address}`);
   
-  // 🔍 MODE CIBLÉ : Seulement les domaines de géolocalisation spécifiques
+  // 🔍 MODE SIMPLE : Seulement les domaines de géolocalisation connus
   const isGeoLocationDomain = GEOLOCATION_DOMAINS.some(geoDomain => 
     domain.includes(geoDomain)
-  ) || domain.includes('callofduty.com') 
-    || domain.includes('activision.com')
-    || (domain.includes('geoip') && !domain.includes('playstation'))
-    || (domain.includes('location') && !domain.includes('playstation'))
-    || (domain.includes('region') && !domain.includes('playstation'))
-    || domain.includes('demonware');
+  );
   
   if (isGeoLocationDomain) {
     console.log(`🌍 Géolocalisation détectée: ${domain}`);
