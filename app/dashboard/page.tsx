@@ -289,11 +289,11 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-gray-400 text-sm">DNS Principal</div>
-                      <div className="text-white font-mono text-xl">192.168.1.100</div>
+                      <div className="text-white font-mono text-xl">192.168.1.31</div>
                       <div className="text-gray-500 text-xs mt-1">Votre serveur DNS intelligent</div>
                     </div>
                     <button
-                      onClick={() => navigator.clipboard?.writeText("192.168.1.100")}
+                      onClick={() => navigator.clipboard?.writeText("192.168.1.31")}
                       className="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-white font-medium transition-colors"
                     >
                       📋 Copier
@@ -359,7 +359,7 @@ export default function DashboardPage() {
             <span className="bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
               SYSTÈME INTELLIGENT
             </span>
-            <span className="text-white"> NOLAG STYLE</span>
+            <span className="text-white"> LOBBYDEZINZIN</span>
           </h3>
           
           <div className="grid md:grid-cols-3 gap-6">
@@ -369,7 +369,7 @@ export default function DashboardPage() {
               </div>
               <h4 className="font-bold text-white mb-2">1. Configuration Unique</h4>
               <p className="text-gray-300 text-sm">
-                Configurez <strong>192.168.1.100</strong> comme DNS sur votre console une seule fois
+                Configurez <strong>192.168.1.31</strong> comme DNS sur votre console une seule fois
               </p>
             </div>
             
