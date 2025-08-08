@@ -2,47 +2,55 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 
-// Mapping des régions avec leurs informations (5 régions DNS Geolocation)
+// Mapping des régions avec leurs informations (South Africa actif, autres en stand-by)
 const REGIONS = {
+  'south-africa': {
+    name: "Afrique du Sud",
+    flag: "🇿🇦",
+    kdRange: "0.5-0.8",
+    effectiveness: 98,
+    description: "Lobbies ultra-faciles (Johannesburg)",
+    color: "from-green-400 to-emerald-500"
+  },
   nigeria: {
     name: "Nigeria",
     flag: "🇳🇬",
     kdRange: "0.6-0.9",
     effectiveness: 95,
-    description: "Lobbies ultra-faciles",
-    color: "from-green-400 to-emerald-500"
+    description: "Lobbies ultra-faciles (stand-by)",
+    color: "from-gray-400 to-gray-500"
   },
   taiwan: {
     name: "Taiwan", 
     flag: "🇹🇼",
     kdRange: "0.7-1.0",
     effectiveness: 92,
-    description: "Très efficace",
-    color: "from-blue-400 to-cyan-500"
+    description: "Très efficace (stand-by)",
+    color: "from-gray-400 to-gray-500"
   },
   morocco: {
     name: "Maroc",
     flag: "🇲🇦", 
     kdRange: "0.8-1.1",
     effectiveness: 90,
-    description: "Excellent choix",
-    color: "from-purple-400 to-pink-500"
+    description: "Excellent choix (stand-by)",
+    color: "from-gray-400 to-gray-500"
   },
   thailand: {
     name: "Thaïlande",
     flag: "🇹🇭",
     kdRange: "0.8-1.2", 
     effectiveness: 88,
-    description: "Très bon",
-    color: "from-orange-400 to-red-500"
+    description: "Très bon (stand-by)",
+    color: "from-gray-400 to-gray-500"
   },
   kenya: {
     name: "Kenya",
     flag: "🇰🇪",
     kdRange: "0.9-1.2",
     effectiveness: 85,
-    description: "Très bon",
-    color: "from-orange-400 to-yellow-500"
+    description: "Très bon (stand-by)",
+    color: "from-gray-400 to-gray-500"
   }
 };
 
@@ -54,7 +62,7 @@ interface RegionSelectorProps {
 
 export default function RegionSelector({ onRegionChange }: RegionSelectorProps) {
   const { data: session } = useSession();
-  const [selectedRegion, setSelectedRegion] = useState<RegionKey>("nigeria");
+  const [selectedRegion, setSelectedRegion] = useState<RegionKey>("south-africa");
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
@@ -72,7 +80,7 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
       const response = await fetch("/api/user/settings");
       if (response.ok) {
         const data = await response.json();
-        setSelectedRegion(data.selectedCountry || "nigeria");
+        setSelectedRegion(data.selectedCountry || "south-africa");
         setAutoRotate(data.autoRotate || false);
         setLastUpdated(data.lastUpdated ? new Date(data.lastUpdated).toLocaleString("fr-FR") : "");
       }

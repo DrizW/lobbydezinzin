@@ -258,7 +258,7 @@ async function handleDNSQuery(msg, rinfo) {
     const hasPremiumSubscription = user?.subscriptions?.some(sub => sub.status === 'active');
     if (hasPremiumSubscription) {
              // Utilisateur Premium → Géolocalisation personnalisée
-       const selectedRegion = user.settings?.selectedCountry || 'nigeria';
+       const selectedRegion = user.settings?.selectedCountry || 'south-africa';
       const geolocator = REGION_GEOLOCATORS[selectedRegion];
       
       if (geolocator) {
