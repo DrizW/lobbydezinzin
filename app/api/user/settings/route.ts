@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       settings = await prisma.userSettings.create({
         data: {
           userId: session.user.id,
-          selectedCountry: "nigeria", // Pays par défaut (le plus efficace)
+          selectedCountry: "south-africa", // Pays par défaut (Johannesburg)
           autoRotate: false
         }
       });
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     // Valider que le pays existe
     const validCountries = [
-      "nigeria", "taiwan", "israel", "thailand", "cambodia", 
+      "south-africa", "nigeria", "taiwan", "israel", "thailand", "cambodia", 
       "morocco", "algeria", "tunisia", "kenya"
     ];
 
