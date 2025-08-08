@@ -16,7 +16,7 @@ WG_SERVER_IP="10.7.0.1"
 WG_CLIENT_IP="10.7.0.2"
 
 # 🌍 Détection du pays (à configurer selon le VPS)
-COUNTRY=${1:-"nigeria"}
+COUNTRY=${1:-"south-africa"}
 echo "🌍 Configuration pour: $COUNTRY"
 
 # 📦 Installation des dépendances

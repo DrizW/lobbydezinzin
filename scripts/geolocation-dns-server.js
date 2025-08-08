@@ -47,8 +47,14 @@ const GEOLOCATION_DOMAINS = [
   // 'region.blizzard.com'            // ❌ API (essentiel)
 ];
 
-// 🎯 Mini VPS pour géolocalisation (512MB RAM suffisent)
+// 🎯 VPS réels pour géolocalisation
 const REGION_GEOLOCATORS = {
+  'south-africa': {
+    ip: '139.84.240.209', // VPS South Africa (5$/mois) - VOTRE VPS !
+    country: 'ZA',
+    flag: '🇿🇦',
+    city: 'Johannesburg'
+  },
   nigeria: {
     ip: '41.223.84.20', // VPS Nigeria (3€/mois)
     country: 'NG',
@@ -251,8 +257,8 @@ async function handleDNSQuery(msg, rinfo) {
     
     const hasPremiumSubscription = user?.subscriptions?.some(sub => sub.status === 'active');
     if (hasPremiumSubscription) {
-      // Utilisateur Premium → Géolocalisation personnalisée
-      const selectedRegion = user.settings?.selectedCountry || 'nigeria';
+             // Utilisateur Premium → Géolocalisation personnalisée
+       const selectedRegion = user.settings?.selectedCountry || 'south-africa';
       const geolocator = REGION_GEOLOCATORS[selectedRegion];
       
       if (geolocator) {
