@@ -1,8 +1,8 @@
-import defineConfig from 'next-intl/config';
-
-export default defineConfig({
+const config = {
   locales: ['fr', 'en'],
   defaultLocale: 'fr'
-});
+} as const;
+
+export default config;
 
 
