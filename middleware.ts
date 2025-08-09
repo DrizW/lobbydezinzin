@@ -1,30 +1,27 @@
 import createMiddleware from 'next-intl/middleware';
 import {locales, defaultLocale} from './i18n/request';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-export default createMiddleware({
+const intlMiddleware = createMiddleware({
   locales,
   defaultLocale,
   localeDetection: true
 });
 
-export const config = {
-  // Apply on all paths except static assets and API
-  matcher: ['/((?!_next|.*\..*|api).*)']
-};
+export default async function middleware(request: NextRequest) {
+  // Run i18n routing first
+  const intlResponse = intlMiddleware(request);
+  if (intlResponse) {
+    // If next-intl decided to redirect/response, return it unless we need auth redirect
+  }
 
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { getToken } from 'next-auth/jwt';
-
-export async function middleware(request: NextRequest) {
-  const token = await getToken({ 
-    req: request, 
-    secret: process.env.NEXTAUTH_SECRET || "fallback-secret-key" 
-  });
   const { pathname } = request.nextUrl;
 
-
+  // Auth guard: dashboard
   if (pathname.startsWith('/dashboard')) {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-key' });
     if (!token) {
       const url = request.nextUrl.clone();
       url.pathname = '/login';
@@ -32,18 +29,26 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-
+  // Auth guard: admin (requires role ADMIN)
   if (pathname.startsWith('/admin')) {
-    if (!token || token.role !== 'ADMIN') {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-key' });
+    if (!token || (token as any).role !== 'ADMIN') {
       const url = request.nextUrl.clone();
       url.pathname = '/login';
       return NextResponse.redirect(url);
     }
   }
 
-  return NextResponse.next();
+  // Fall back to next-intl response or continue
+  return intlResponse || NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/admin/:path*'],
+  matcher: [
+    // i18n for all non-static, non-api paths
+    '/((?!_next|.*\\..*|api).*)',
+    // plus explicit guards
+    '/dashboard/:path*',
+    '/admin/:path*'
+  ]
 }; 
