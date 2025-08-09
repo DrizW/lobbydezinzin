@@ -50,10 +50,10 @@ export default function Header() {
           
           <nav className="hidden md:flex items-center space-x-8">
             <Link href="/benefices" className="text-gray-300 hover:text-orange-400 transition-colors duration-200 font-medium">
-              {t("nav.benefits")}
+              ⚙️ {t("nav.benefits")}
             </Link>
             <Link href="/countries" className="text-gray-300 hover:text-orange-400 transition-colors duration-200 font-medium">
-              {t("nav.help")}
+              ❓ {t("nav.help")}
             </Link>
             {status !== "loading" && session?.user?.role === "ADMIN" && (
               <Link href="/admin">
