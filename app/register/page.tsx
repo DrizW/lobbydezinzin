@@ -2,14 +2,24 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {useTranslations} from 'next-intl';
+// i18n désactivé pour stabilité build
 
 function isStrongPassword(pw: string) {
   return pw.length >= 8 && /[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw);
 }
 
 export default function RegisterPage() {
-  const t = useTranslations();
+  const t = (key: string) => {
+    const dict: Record<string, string> = {
+      'register.title': 'Créer un compte',
+      'register.passwordRule': 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre.',
+      'register.submit': "S'inscrire",
+      'register.success': 'Compte créé ! Redirection...',
+      'register.loginLink': 'Déjà un compte ? Se connecter',
+      'register.error': "Erreur lors de l'inscription"
+    };
+    return dict[key] || key;
+  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");

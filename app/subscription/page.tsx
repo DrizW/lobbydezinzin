@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import {useTranslations} from 'next-intl';
+// i18n désactivé pour stabilité build
 
 const plans = [
   {
@@ -28,7 +28,22 @@ const plans = [
 ];
 
 export default function SubscriptionPage() {
-  const t = useTranslations();
+  const t = (key: string, vars?: Record<string, string>) => {
+    const dict: Record<string, string> = {
+      'subs.header.title1': 'CHOISISSEZ',
+      'subs.header.title2': ' VOTRE PLAN',
+      'subs.subtitle': 'Accédez aux meilleurs lobbies Warzone et dominez la compétition avec nos DNS optimisés',
+      'subs.plan.unique': 'PLAN UNIQUE',
+      'subs.plan.month': 'mois',
+      'subs.plan.tagline': 'La solution ultime pour dominer Warzone avec des lobbies faciles',
+      'subs.plan.activating': 'Activation en cours...',
+      'subs.plan.activate': `🚀 Activer Premium - ${vars?.price ?? ''}€/mois`,
+      'subs.testMode': "💳 Mode test activé - Aucun paiement réel pour l'instant",
+      'subs.faq': 'QUESTIONS FRÉQUENTES',
+      'subs.back': '← Retour au Dashboard'
+    };
+    return dict[key] || key;
+  };
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);

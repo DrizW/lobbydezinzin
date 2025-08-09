@@ -3,10 +3,20 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {useTranslations} from 'next-intl';
+// i18n désactivé pour stabilité build
 
 export default function LoginPage() {
-  const t = useTranslations();
+  const t = (key: string) => {
+    const dict: Record<string, string> = {
+      'login.title': 'Connexion',
+      'login.email': 'Email',
+      'login.password': 'Mot de passe',
+      'login.submit': 'Se connecter',
+      'login.error': 'Email ou mot de passe incorrect',
+      'login.registerLink': 'Créer un compte'
+    };
+    return dict[key] || key;
+  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");

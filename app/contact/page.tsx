@@ -1,10 +1,39 @@
 "use client";
 import { useState } from "react";
 import ClientOnly from "../components/ClientOnly";
-import {useTranslations} from 'next-intl';
+// i18n désactivé pour stabilité build
 
 export default function ContactPage() {
-  const t = useTranslations();
+  const t = (key: string) => {
+    const dict: Record<string, string> = {
+      'contact.header.title1': 'Assistance',
+      'contact.header.title2': ' Technique',
+      'contact.header.subtitle': "Notre équipe est là pour vous aider à optimiser votre expérience LobbyDeZinzin",
+      'contact.form.title': 'Ticket de Support',
+      'contact.form.success': 'Ticket créé avec succès !',
+      'contact.form.successNote': 'Notre équipe technique vous répondra sous 24h.',
+      'contact.form.new': 'Créer un nouveau ticket',
+      'contact.form.name': 'Nom complet *',
+      'contact.form.email': 'Email *',
+      'contact.form.subject': 'Sujet *',
+      'contact.form.priority': 'Priorité',
+      'contact.form.message': 'Message *',
+      'contact.form.submit': 'Créer le ticket',
+      'contact.form.sending': 'Envoi en cours...',
+      'contact.links.title': 'Liens Utiles',
+      'contact.support.title': 'Support Technique',
+      'contact.quick.problem': 'Problème de connexion ?',
+      'contact.quick.faq': "Vérifiez d'abord notre",
+      'contact.quick.response': 'Temps de réponse',
+      'contact.quick.responseDetail': 'Premium : 2-4h • Standard : 12-24h',
+      'contact.quick.always': 'Support 24/7',
+      'contact.quick.alwaysDetail': 'Notre équipe est disponible tous les jours pour vous aider',
+      'contact.link.faq': 'FAQ & Guides',
+      'contact.link.dashboard': 'Mon Dashboard',
+      'contact.link.premium': 'Passer Premium'
+    };
+    return dict[key] || key;
+  };
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "", priority: "normal" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
