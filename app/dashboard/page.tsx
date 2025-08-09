@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import ClientOnly from "../components/ClientOnly";
 import RegionSelector from "../components/RegionSelector";
 import Image from "next/image";
-import {useTranslations} from 'next-intl';
+// i18n désactivé pour stabilité build
 
 type Country = {
   id: string;
@@ -29,7 +29,22 @@ type CountriesResponse = {
 };
 
 export default function DashboardPage() {
-  const t = useTranslations();
+  const t = (key: string) => {
+    const dict: Record<string, string> = {
+      'dash.title': 'MON DASHBOARD',
+      'dash.subtitle': 'Gérez vos DNS et accédez à des lobbies plus faciles',
+      'dash.currentCountry': 'Pays Actuel',
+      'dash.kdAverage': 'KD Moyen',
+      'dash.lobbiesTested': 'Lobbies Testés',
+      'dash.selection.title1': 'SÉLECTION DE',
+      'dash.selection.title2': ' RÉGION',
+      'dash.premium.required': 'Abonnement Premium Requis',
+      'dash.premium.cta': "S'abonner Maintenant",
+      'dash.uniqueSetup': 'Configuration Unique',
+      'dash.uniqueSetup.desc': "Configurez une seule fois ce DNS sur votre console, puis changez de région via l'interface web !"
+    };
+    return dict[key] || key;
+  };
   const { data: session } = useSession();
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);

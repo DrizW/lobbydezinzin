@@ -3,11 +3,21 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import Logo from "./Logo";
-import {useTranslations} from 'next-intl';
+// i18n désactivé pour stabilité build
 
 export default function Header() {
   const { data: session, status } = useSession();
-  const t = useTranslations();
+  const t = (key: string) => {
+    const dict: Record<string, string> = {
+      'nav.benefits': 'Bénéfices',
+      'nav.help': 'Aide',
+      'nav.contact': 'Contact',
+      'nav.login': 'Connexion',
+      'nav.admin': 'Admin',
+      'nav.logout': 'Déconnexion'
+    };
+    return dict[key] || key;
+  };
 
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -19,10 +29,7 @@ export default function Header() {
 
   const handleSignOut = () => { signOut({ callbackUrl: "/" }); };
 
-  const switchLocale = (locale: 'fr'|'en') => {
-    try { document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000`; } catch {}
-    window.location.reload();
-  };
+  const switchLocale = (_locale: 'fr'|'en') => { setShowLangMenu(false); };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

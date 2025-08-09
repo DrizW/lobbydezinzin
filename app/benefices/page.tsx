@@ -1,10 +1,31 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {useTranslations} from 'next-intl';
+// i18n désactivé pour stabilité build
 
 export default function BeneficesPage() {
-  const t = useTranslations();
+  const t = (key: string) => {
+    const dict: Record<string, string> = {
+      'benef.title': 'Bénéfices',
+      'benef.banner1': 'Ping en partie',
+      'benef.banner2': 'Simplicité',
+      'benef.banner3': 'Régions',
+      'benef.card1.title': 'Matchs plus faciles',
+      'benef.card1.p1': 'Accédez à des lobbies avec KD moyen plus bas',
+      'benef.card1.p2': 'Plus de sérénité, plus de tops 1',
+      'benef.card1.p3': 'Moins de tryhard et de tricheurs perçus',
+      'benef.card2.title': 'Ping optimisé',
+      'benef.card2.p1': 'Aucun changement dans vos parties locales',
+      'benef.card2.p2': 'Le trafic jeu reste direct (DNS dédié)',
+      'benef.card2.p3': 'Connexion stable et réactive',
+      'benef.card3.title': 'Ultra simple',
+      'benef.card3.p1': 'Configurez notre DNS sur votre console une fois',
+      'benef.card3.p2': 'Changez de région depuis le dashboard',
+      'benef.card3.p3': 'Effet immédiat sur vos prochains lobbies',
+      'benef.cta': 'Commencer Gratuitement'
+    };
+    return dict[key] || key;
+  };
   const [showSticky, setShowSticky] = useState(false);
   useEffect(() => {
     const onScroll = () => setShowSticky(window.scrollY > 200);

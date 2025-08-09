@@ -3,10 +3,21 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Logo from "./components/Logo";
-import {useTranslations} from 'next-intl';
+// i18n désactivé pour stabilité build
 
 export default function HomePage() {
-  const t = useTranslations();
+  const t = (key: string) => {
+    const dict: Record<string, string> = {
+      'home.title1': 'CONTOURNEZ',
+      'home.title2': 'LE SBMM',
+      'home.subtitle': "Accédez à des lobbies Warzone avec des KD plus bas grâce à nos DNS spécialisés. Plus de lobbies sweat, plus de fun !",
+      'home.ctaPrimary': 'Commencer Maintenant',
+      'home.ctaSecondary': 'En Savoir Plus',
+      'home.features.title1': 'POURQUOI',
+      'home.features.title2': ' CHOISIR LOBBY DEZINZIN ?'
+    };
+    return dict[key] || key;
+  };
   const { data: session } = useSession();
   const [userStatus, setUserStatus] = useState<"loading" | "free" | "premium">("loading");
 
