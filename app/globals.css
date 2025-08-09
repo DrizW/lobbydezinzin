@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities; 
+@tailwind utilities;
+
+/* Ensure color emoji support (flags) across desktops */
+.emoji {
+  font-family: 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji','EmojiOne Color','Twemoji Mozilla', system-ui, sans-serif;
+}
+
+/* Subtle animated background utility */
+@keyframes slow-pan {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+.animate-slow-pan {
+  animation: slow-pan 22s ease-in-out infinite alternate;
+} 
