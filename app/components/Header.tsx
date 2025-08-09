@@ -3,10 +3,16 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import Logo from "./Logo";
-// i18n désactivé pour stabilité build
 
 export default function Header() {
   const { data: session, status } = useSession();
+
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+
   const t = (key: string) => {
     const dict: Record<string, string> = {
       'nav.benefits': 'Bénéfices',
@@ -19,24 +25,13 @@ export default function Header() {
     return dict[key] || key;
   };
 
-  const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showLangMenu, setShowLangMenu] = useState(false);
-
-  const accountMenuRef = useRef<HTMLDivElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const langMenuRef = useRef<HTMLDivElement>(null);
-
   const handleSignOut = () => { signOut({ callbackUrl: "/" }); };
-
-  const switchLocale = (_locale: 'fr'|'en') => { setShowLangMenu(false); };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
       if (accountMenuRef.current && !accountMenuRef.current.contains(target)) setShowAccountMenu(false);
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) setShowMobileMenu(false);
-      if (langMenuRef.current && !langMenuRef.current.contains(target)) setShowLangMenu(false);
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -60,22 +55,6 @@ export default function Header() {
             <Link href="/countries" className="text-gray-300 hover:text-orange-400 transition-colors duration-200 font-medium">
               {t("nav.help")}
             </Link>
-
-            {/* Language dropdown */}
-            <div className="relative" ref={langMenuRef}>
-              <button onClick={() => setShowLangMenu(v=>!v)} className="text-gray-300 hover:text-white px-3 py-2 border border-gray-700 rounded-lg flex items-center gap-2">
-                <span>🌐</span>
-                <span className="text-sm">Langue</span>
-                <svg className={`w-4 h-4 ${showLangMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/></svg>
-              </button>
-              {showLangMenu && (
-                <div className="absolute right-0 mt-2 w-32 bg-gray-800 border border-gray-700 rounded-lg shadow-xl">
-                  <button onClick={() => switchLocale('fr')} className="w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700">Français</button>
-                  <button onClick={() => switchLocale('en')} className="w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700">English</button>
-                </div>
-              )}
-            </div>
-            
             {status === "loading" ? (
               <div className="bg-gray-700 px-4 py-2 rounded-lg text-gray-300 animate-pulse">Chargement...</div>
             ) : session ? (
@@ -111,10 +90,6 @@ export default function Header() {
                 <Link href="/benefices" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>{t("nav.benefits")}</Link>
                 <Link href="/countries" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>{t("nav.help")}</Link>
                 <Link href="/contact" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>{t("nav.contact")}</Link>
-                <div className="border-t border-gray-700/50 my-2"></div>
-                {/* Mobile language quick actions */}
-                <button onClick={() => {switchLocale('fr'); setShowMobileMenu(false);}} className="w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700">Français</button>
-                <button onClick={() => {switchLocale('en'); setShowMobileMenu(false);}} className="w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700">English</button>
                 <div className="border-t border-gray-700/50 my-2"></div>
                 {session ? (
                   <>

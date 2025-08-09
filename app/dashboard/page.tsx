@@ -235,10 +235,55 @@ export default function DashboardPage() {
           ) : hasAccess ? (
             <div className="grid lg:grid-cols-2 gap-8">
               <RegionSelector onRegionChange={handleRegionChange} />
-              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-6">
-                <h3 className="text-2xl font-bold text-white mb-4">⚙️ {t('dash.uniqueSetup')}</h3>
-                <p className="text-gray-400 mb-6">{t('dash.uniqueSetup.desc')}</p>
-                {/* DNS bloc conservé */}
+              {/* Configuration DNS unique */}
+              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-8">
+                <h3 className="text-3xl font-bold text-white mb-4">⚙️ Configuration Unique</h3>
+                <p className="text-gray-300 mb-6">
+                  Configurez une seule fois ce DNS sur votre console, puis changez de région via l'interface web !
+                </p>
+
+                <div className="bg-gray-700/50 rounded-lg p-4 mb-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-gray-400 text-sm">DNS Principal</div>
+                      <div className="text-white font-mono text-xl">192.168.1.31</div>
+                      <div className="text-gray-500 text-xs mt-1">Votre serveur DNS intelligent</div>
+                    </div>
+                    <button onClick={() => navigator.clipboard?.writeText("192.168.1.31")} className="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-white font-medium transition-colors">📋 Copier</button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-sm">1</span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white">Configuration Console/PC</h4>
+                      <p className="text-gray-300 text-sm">Utilisez le DNS ci-dessus dans vos paramètres réseau</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-sm">2</span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white">Changement de Région</h4>
+                      <p className="text-gray-300 text-sm">Sélectionnez votre région via l'interface web (à gauche)</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-sm">3</span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white">Effet Immédiat</h4>
+                      <p className="text-gray-300 text-sm">Les nouveaux lobbies utilisent automatiquement la région choisie</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
