@@ -79,7 +79,7 @@ export default function HomePage() {
                   {buttonProps.text}
                 </button>
               </Link>
-              <Link href="/#features">
+              <Link href="/benefices">
                 <button className="border-2 border-gray-600 hover:border-orange-500 px-8 py-4 rounded-xl text-gray-300 hover:text-orange-400 font-bold text-lg transition-all duration-300">
                   En Savoir Plus
                 </button>
@@ -89,53 +89,42 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Quick Actions (dynamiques) */}
-      <section className="py-6">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="grid sm:grid-cols-2 gap-4">
-            {!session ? (
-              <>
-                <Link href="/login">
-                  <button className="w-full border-2 border-gray-700 hover:border-blue-500 text-gray-300 hover:text-blue-300 rounded-xl py-3 transition-all">
-                    Se connecter
-                  </button>
-                </Link>
-                <Link href="/register">
-                  <button className="w-full border-2 border-gray-700 hover:border-emerald-500 text-gray-300 hover:text-emerald-300 rounded-xl py-3 transition-all">
-                    Créer un compte
-                  </button>
-                </Link>
-              </>
-            ) : userStatus === "premium" ? (
-              <>
-                <Link href="/dashboard">
-                  <button className="w-full border-2 border-emerald-600/50 hover:border-emerald-400 text-emerald-300 hover:text-emerald-200 rounded-xl py-3 transition-all">
-                    Accéder au Dashboard
-                  </button>
-                </Link>
-                <Link href="/dashboard">
-                  <button className="w-full border-2 border-orange-600/50 hover:border-orange-400 text-orange-300 hover:text-orange-200 rounded-xl py-3 transition-all">
-                    Changer de région
-                  </button>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/subscription">
-                  <button className="w-full border-2 border-orange-600/50 hover:border-orange-400 text-orange-300 hover:text-orange-200 rounded-xl py-3 transition-all">
-                    Passer Premium
-                  </button>
-                </Link>
-                <Link href="/dashboard">
-                  <button className="w-full border-2 border-gray-700 hover:border-blue-500 text-gray-300 hover:text-blue-300 rounded-xl py-3 transition-all">
-                    Voir le Dashboard
-                  </button>
-                </Link>
-              </>
-            )}
+      {/* Quick Actions (dynamiques) - uniquement pour utilisateurs connectés */}
+      {session && (
+        <section className="py-6">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="grid sm:grid-cols-2 gap-4">
+              {userStatus === "premium" ? (
+                <>
+                  <Link href="/dashboard">
+                    <button className="w-full border-2 border-emerald-600/50 hover:border-emerald-400 text-emerald-300 hover:text-emerald-200 rounded-xl py-3 transition-all">
+                      Accéder au Dashboard
+                    </button>
+                  </Link>
+                  <Link href="/dashboard">
+                    <button className="w-full border-2 border-orange-600/50 hover:border-orange-400 text-orange-300 hover:text-orange-200 rounded-xl py-3 transition-all">
+                      Changer de région
+                    </button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/dashboard">
+                    <button className="w-full border-2 border-gray-700 hover:border-blue-500 text-gray-300 hover:text-blue-300 rounded-xl py-3 transition-all">
+                      Voir le Dashboard
+                    </button>
+                  </Link>
+                  <Link href="/benefices">
+                    <button className="w-full border-2 border-gray-700 hover:border-orange-500 text-gray-300 hover:text-orange-300 rounded-xl py-3 transition-all">
+                      Découvrir les fonctionnalités
+                    </button>
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Features Section */}
       <section id="features" className="py-20 bg-gray-900/50">

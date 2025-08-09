@@ -39,8 +39,8 @@ export default function Header() {
           </Link>
           
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/#features" className="text-gray-300 hover:text-orange-400 transition-colors duration-200 font-medium">
-              Avantages
+            <Link href="/benefices" className="text-gray-300 hover:text-orange-400 transition-colors duration-200 font-medium">
+              Bénéfices
             </Link>
             <Link href="/countries" className="text-gray-300 hover:text-orange-400 transition-colors duration-200 font-medium">
               Aide
@@ -145,11 +145,11 @@ export default function Header() {
             {showMenu && (
               <div className="absolute right-4 top-16 w-64 bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-700/50 py-2 z-50">
                 <Link 
-                  href="/#features" 
+                  href="/benefices" 
                   className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200"
                   onClick={() => setShowMenu(false)}
                 >
-                  Avantages
+                  Bénéfices
                 </Link>
                 <Link 
                   href="/countries" 
