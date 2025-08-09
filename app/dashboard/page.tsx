@@ -32,14 +32,14 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [requiresSubscription, setRequiresSubscription] = useState(false);
   const [accessMessage, setAccessMessage] = useState<string>("");
-  const [currentRegion, setCurrentRegion] = useState<string>("nigeria");
+  const [currentRegion, setCurrentRegion] = useState<string>("south-africa");
   const [regionStats, setRegionStats] = useState({
-    name: "Nigeria",
-    flag: "🇳🇬",
-    kdAverage: 0.75,
-    lobbiesTested: 24,
-    kdRange: "0.6-0.9",
-    timezone: "Africa/Lagos",
+    name: "Afrique du Sud",
+    flag: "🇿🇦",
+    kdAverage: 0.65,
+    lobbiesTested: 28,
+    kdRange: "0.5-0.8",
+    timezone: "Africa/Johannesburg",
     localTime: "12:00"
   });
 
@@ -60,7 +60,7 @@ export default function DashboardPage() {
       const response = await fetch("/api/user/settings");
       if (response.ok) {
         const data = await response.json();
-        const userRegion = data.selectedCountry || "nigeria";
+        const userRegion = data.selectedCountry || "south-africa";
         setCurrentRegion(userRegion);
         updateRegionStats(userRegion);
       }
@@ -97,20 +97,44 @@ export default function DashboardPage() {
     updateRegionStats(region);
   };
 
-  const updateRegionStats = (region: string) => {
+  const fetchDynamicStats = async (region: string) => {
+    try {
+      const res = await fetch(`/api/stats/region?key=${encodeURIComponent(region)}`);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const updateRegionStats = async (region: string) => {
     const regionData = {
+      'south-africa': { name: "Afrique du Sud", flag: "🇿🇦", kdAverage: 0.65, lobbiesTested: 28, kdRange: "0.5-0.8", timezone: "Africa/Johannesburg" },
       nigeria: { name: "Nigeria", flag: "🇳🇬", kdAverage: 0.75, lobbiesTested: 24, kdRange: "0.6-0.9", timezone: "Africa/Lagos" },
       taiwan: { name: "Taiwan", flag: "🇹🇼", kdAverage: 0.85, lobbiesTested: 18, kdRange: "0.7-1.0", timezone: "Asia/Taipei" },
       morocco: { name: "Maroc", flag: "🇲🇦", kdAverage: 0.95, lobbiesTested: 21, kdRange: "0.8-1.1", timezone: "Africa/Casablanca" },
       thailand: { name: "Thaïlande", flag: "🇹🇭", kdAverage: 1.0, lobbiesTested: 15, kdRange: "0.8-1.2", timezone: "Asia/Bangkok" },
       kenya: { name: "Kenya", flag: "🇰🇪", kdAverage: 1.05, lobbiesTested: 17, kdRange: "0.9-1.2", timezone: "Africa/Nairobi" },
-      cambodia: { name: "Cambodge", flag: "🇰🇭", kdAverage: 1.1, lobbiesTested: 12, kdRange: "0.9-1.2", timezone: "Asia/Phnom_Penh" },
-      algeria: { name: "Algérie", flag: "🇩🇿", kdAverage: 1.15, lobbiesTested: 14, kdRange: "1.0-1.3", timezone: "Africa/Algiers" },
-      tunisia: { name: "Tunisie", flag: "🇹🇳", kdAverage: 1.2, lobbiesTested: 11, kdRange: "1.0-1.4", timezone: "Africa/Tunis" }
-    };
+    } as const;
 
-    const stats = regionData[region as keyof typeof regionData] || regionData.nigeria;
-    setRegionStats({ ...stats, localTime: getLocalTime(stats.timezone) });
+    const fallback = regionData[region as keyof typeof regionData] || regionData['south-africa'];
+
+    // Try dynamic API, fallback to local constants
+    const dynamic = await fetchDynamicStats(region);
+    if (dynamic) {
+      setRegionStats({
+        name: dynamic.name ?? fallback.name,
+        flag: dynamic.flag ?? fallback.flag,
+        kdAverage: dynamic.kdAverage ?? fallback.kdAverage,
+        lobbiesTested: dynamic.lobbiesTested ?? fallback.lobbiesTested,
+        kdRange: dynamic.kdRange ?? fallback.kdRange,
+        timezone: dynamic.timezone ?? fallback.timezone,
+        localTime: dynamic.localTime ?? new Intl.DateTimeFormat('fr-FR', { timeZone: fallback.timezone, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date())
+      });
+      return;
+    }
+
+    setRegionStats({ ...fallback, localTime: getLocalTime(fallback.timezone) });
   };
 
   const getLocalTime = (timezone: string) => {

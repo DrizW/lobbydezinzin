@@ -89,6 +89,54 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Quick Actions (dynamiques) */}
+      <section className="py-6">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="grid sm:grid-cols-2 gap-4">
+            {!session ? (
+              <>
+                <Link href="/login">
+                  <button className="w-full border-2 border-gray-700 hover:border-blue-500 text-gray-300 hover:text-blue-300 rounded-xl py-3 transition-all">
+                    Se connecter
+                  </button>
+                </Link>
+                <Link href="/register">
+                  <button className="w-full border-2 border-gray-700 hover:border-emerald-500 text-gray-300 hover:text-emerald-300 rounded-xl py-3 transition-all">
+                    Créer un compte
+                  </button>
+                </Link>
+              </>
+            ) : userStatus === "premium" ? (
+              <>
+                <Link href="/dashboard">
+                  <button className="w-full border-2 border-emerald-600/50 hover:border-emerald-400 text-emerald-300 hover:text-emerald-200 rounded-xl py-3 transition-all">
+                    Accéder au Dashboard
+                  </button>
+                </Link>
+                <Link href="/dashboard">
+                  <button className="w-full border-2 border-orange-600/50 hover:border-orange-400 text-orange-300 hover:text-orange-200 rounded-xl py-3 transition-all">
+                    Changer de région
+                  </button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/subscription">
+                  <button className="w-full border-2 border-orange-600/50 hover:border-orange-400 text-orange-300 hover:text-orange-200 rounded-xl py-3 transition-all">
+                    Passer Premium
+                  </button>
+                </Link>
+                <Link href="/dashboard">
+                  <button className="w-full border-2 border-gray-700 hover:border-blue-500 text-gray-300 hover:text-blue-300 rounded-xl py-3 transition-all">
+                    Voir le Dashboard
+                  </button>
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-20 bg-gray-900/50">
         <div className="max-w-7xl mx-auto px-6">
@@ -126,8 +174,8 @@ export default function HomePage() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">Pays Optimisés</h3>
               <p className="text-gray-300 leading-relaxed">
-                DNS spécialisés pour Nigeria, Taiwan, Israël, Thaïlande, Cambodge, 
-                Maroc, Algérie, Tunisie, Kenya. Lobbies garantis !
+                DNS spécialisés pour plusieurs régions à faible KD. 
+                Lobbies garantis !
               </p>
             </div>
 
@@ -183,11 +231,11 @@ export default function HomePage() {
 
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border border-gray-700/50 text-center group hover:border-blue-500/50 transition-all duration-300">
               <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-white">🇮🇱</span>
+                <span className="text-2xl font-bold text-white">🇿🇦</span>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Israël</h3>
-              <p className="text-gray-300 mb-4">Lobbies faciles</p>
-              <div className="text-green-400 font-bold">KD: 0.8-1.1</div>
+              <h3 className="text-2xl font-bold text-white mb-4">Afrique du Sud</h3>
+              <p className="text-gray-300 mb-4">Johannesburg - Actif</p>
+              <div className="text-green-400 font-bold">KD: 0.5-0.8</div>
             </div>
           </div>
         </div>
