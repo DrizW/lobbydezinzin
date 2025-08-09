@@ -1,3 +1,17 @@
+import createMiddleware from 'next-intl/middleware';
+import {locales, defaultLocale} from './i18n/request';
+
+export default createMiddleware({
+  locales,
+  defaultLocale,
+  localeDetection: true
+});
+
+export const config = {
+  // Apply on all paths except static assets and API
+  matcher: ['/((?!_next|.*\..*|api).*)']
+};
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';

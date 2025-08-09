@@ -3,8 +3,10 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Logo from "./components/Logo";
+import {useTranslations} from 'next-intl';
 
 export default function HomePage() {
+  const t = useTranslations();
   const { data: session } = useSession();
   const [userStatus, setUserStatus] = useState<"loading" | "free" | "premium">("loading");
 
@@ -26,7 +28,7 @@ export default function HomePage() {
     if (!session) {
       return {
         href: "/register",
-        text: "Commencer Maintenant"
+        text: t('home.ctaPrimary')
       };
     }
     
@@ -59,18 +61,13 @@ export default function HomePage() {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-orange-400 via-red-500 to-yellow-500 bg-clip-text text-transparent">
-                CONTOURNEZ
-              </span>
+              <span className="bg-gradient-to-r from-orange-400 via-red-500 to-yellow-500 bg-clip-text text-transparent">{t('home.title1')}</span>
               <br />
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-500 to-blue-600 bg-clip-text text-transparent">
-                LE SBMM
-              </span>
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-500 to-blue-600 bg-clip-text text-transparent">{t('home.title2')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Accédez à des lobbies Warzone avec des KD plus bas grâce à nos DNS spécialisés. 
-              Plus de lobbies sweat, plus de fun !
+              {t('home.subtitle')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -81,7 +78,7 @@ export default function HomePage() {
               </Link>
               <Link href="/benefices">
                 <button className="border-2 border-gray-600 hover:border-orange-500 px-8 py-4 rounded-xl text-gray-300 hover:text-orange-400 font-bold text-lg transition-all duration-300">
-                  En Savoir Plus
+                  {t('home.ctaSecondary')}
                 </button>
               </Link>
             </div>
@@ -131,10 +128,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-                POURQUOI
-              </span>
-              <span className="text-white"> CHOISIR LOBBY DEZINZIN ?</span>
+              <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">{t('home.features.title1')}</span>
+              <span className="text-white">{t('home.features.title2')}</span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Contournez le SBMM et retrouvez le plaisir de jouer
@@ -245,7 +240,7 @@ export default function HomePage() {
             </p>
             <Link href="/register">
               <button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-10 py-4 rounded-xl text-white font-bold text-xl transition-all duration-300 shadow-2xl hover:shadow-orange-500/25 transform hover:scale-105">
-                Commencer Gratuitement
+                {t('home.ctaPrimary')}
               </button>
             </Link>
           </div>

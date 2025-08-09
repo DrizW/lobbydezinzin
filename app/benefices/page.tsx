@@ -1,8 +1,10 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import {useTranslations} from 'next-intl';
 
 export default function BeneficesPage() {
+  const t = useTranslations();
   const [showSticky, setShowSticky] = useState(false);
   useEffect(() => {
     const onScroll = () => setShowSticky(window.scrollY > 200);
@@ -11,25 +13,24 @@ export default function BeneficesPage() {
   }, []);
 
   const items = [
-    { title: "Matchs plus faciles", points: ["Accédez à des lobbies avec KD moyen plus bas","Plus de sérénité, plus de tops 1","Moins de tryhard et de tricheurs perçus"], badge: "KD moyen 0.7 – 1.0 (selon région)", color: "from-orange-500 to-red-600", icon: "🏆" },
-    { title: "Ping optimisé", points: ["Aucun changement dans vos parties locales","Le trafic jeu reste direct (DNS dédié)","Connexion stable et réactive"], badge: "Expérience fluide", color: "from-blue-500 to-cyan-600", icon: "⚡" },
-    { title: "Ultra simple", points: ["Configurez notre DNS sur votre console une fois","Changez de région depuis le dashboard","Effet immédiat sur vos prochains lobbies"], badge: "Sans PC, sans appli", color: "from-green-500 to-emerald-600", icon: "🧩" }
+    { title: t('benef.card1.title'), points: [t('benef.card1.p1'), t('benef.card1.p2'), t('benef.card1.p3')], badge: "KD 0.7 – 1.0", color: "from-orange-500 to-red-600", icon: "🏆" },
+    { title: t('benef.card2.title'), points: [t('benef.card2.p1'), t('benef.card2.p2'), t('benef.card2.p3')], badge: "", color: "from-blue-500 to-cyan-600", icon: "⚡" },
+    { title: t('benef.card3.title'), points: [t('benef.card3.p1'), t('benef.card3.p2'), t('benef.card3.p3')], badge: "", color: "from-green-500 to-emerald-600", icon: "🧩" }
   ];
 
   const highlights = [
-    { label: "Ping en partie", value: "inchangé", color: "text-green-400" },
-    { label: "Simplicité", value: "DNS unique", color: "text-cyan-400" },
-    { label: "Régions", value: "au choix", color: "text-orange-400" }
+    { label: t('benef.banner1'), value: "inchangé", color: "text-green-400" },
+    { label: t('benef.banner2'), value: "DNS unique", color: "text-cyan-400" },
+    { label: t('benef.banner3'), value: "au choix", color: "text-orange-400" }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black">
-      {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 animate-slow-pan bg-[radial-gradient(circle_at_20%_20%,rgba(255,115,0,0.12),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(0,180,255,0.12),transparent_40%)]"></div>
         <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-10">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-4">
-            <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Bénéfices</span>
+            <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">{t('benef.title')}</span>
           </h1>
           <p className="text-gray-300 text-lg max-w-3xl">
             Tout ce que vous gagnez avec le DNS LobbyDeZinzin, sans complexité et sans logiciel à installer.
@@ -45,7 +46,6 @@ export default function BeneficesPage() {
         </div>
       </section>
 
-      {/* Cards */}
       <section className="max-w-6xl mx-auto px-6 pb-10">
         <div className="grid md:grid-cols-3 gap-8">
           {items.map((it) => (
@@ -55,13 +55,11 @@ export default function BeneficesPage() {
               <ul className="text-gray-300 space-y-2 mb-4 list-disc list-inside">
                 {it.points.map(p => (<li key={p}>{p}</li>))}
               </ul>
-              <div className="inline-block text-xs text-gray-200 bg-gray-700/50 border border-gray-600/60 rounded-full px-3 py-1">{it.badge}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Explanation band */}
       <section className="bg-gradient-to-r from-orange-500/10 via-pink-500/10 to-cyan-500/10 border-y border-gray-700/40">
         <div className="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-6">
           <div>
@@ -79,16 +77,14 @@ export default function BeneficesPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="max-w-6xl mx-auto px-6 py-14 text-center">
         <Link href="/register">
           <button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-10 py-4 rounded-xl text-white font-bold text-xl transition-all duration-300 shadow-2xl hover:shadow-orange-500/25 transform hover:scale-105">
-            Commencer Gratuitement
+            {t('benef.cta')}
           </button>
         </Link>
       </section>
 
-      {/* Mobile sticky banner */}
       {showSticky && (
         <div className="fixed bottom-3 left-3 right-3 md:hidden z-40">
           <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl shadow-xl p-3 flex items-center justify-between">
