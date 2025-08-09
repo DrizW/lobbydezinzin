@@ -55,6 +55,13 @@ export default function Header() {
             <Link href="/countries" className="text-gray-300 hover:text-orange-400 transition-colors duration-200 font-medium">
               {t("nav.help")}
             </Link>
+            {status !== "loading" && session?.user?.role === "ADMIN" && (
+              <Link href="/admin">
+                <button className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 px-6 py-2 rounded-lg text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl">
+                  👑 Panel Admin
+                </button>
+              </Link>
+            )}
             {status === "loading" ? (
               <div className="bg-gray-700 px-4 py-2 rounded-lg text-gray-300 animate-pulse">Chargement...</div>
             ) : session ? (
@@ -87,21 +94,21 @@ export default function Header() {
             </button>
             {showMobileMenu && (
               <div className="absolute right-4 top-16 w-64 bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-700/50 py-2 z-50">
-                <Link href="/benefices" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>{t("nav.benefits")}</Link>
-                <Link href="/countries" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>{t("nav.help")}</Link>
-                <Link href="/contact" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>{t("nav.contact")}</Link>
+                <Link href="/benefices" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>⚙️ {t("nav.benefits")}</Link>
+                <Link href="/countries" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>❓ {t("nav.help")}</Link>
+                <Link href="/contact" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>💬 {t("nav.contact")}</Link>
                 <div className="border-t border-gray-700/50 my-2"></div>
                 {session ? (
                   <>
-                    <Link href="/dashboard" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>Dashboard</Link>
-                    {session.user?.role === "ADMIN" && (<Link href="/admin" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>{t("nav.admin")}</Link>)}
+                    <Link href="/dashboard" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>📊 Dashboard</Link>
+                    {session.user?.role === "ADMIN" && (<Link href="/admin" className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>👑 {t("nav.admin")}</Link>)}
                     <div className="border-t border-gray-700/50 my-2"></div>
-                    <button onClick={() => {setShowMobileMenu(false); handleSignOut();}} className="flex items-center w-full px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors duration-200">{t("nav.logout")}</button>
+                    <button onClick={() => {setShowMobileMenu(false); handleSignOut();}} className="flex items-center w-full px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors duration-200">🚪 {t("nav.logout")}</button>
                   </>
                 ) : (
                   <>
                     <div className="border-t border-gray-700/50 my-2"></div>
-                    <Link href="/login" className="flex items-center px-4 py-3 text-sm text-orange-400 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>{t("nav.login")}</Link>
+                    <Link href="/login" className="flex items-center px-4 py-3 text-sm text-orange-400 hover:bg-gray-700/50 transition-colors duration-200" onClick={() => setShowMobileMenu(false)}>🔑 {t("nav.login")}</Link>
                   </>
                 )}
               </div>
