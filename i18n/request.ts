@@ -8,7 +8,7 @@ export const defaultLocale: AppLocale = 'fr';
 export default getRequestConfig(async () => {
   let locale: AppLocale = defaultLocale;
   try {
-    const accept = (headers().get('accept-language') || '').toLowerCase();
+    const accept = ((await headers()).get('accept-language') || '').toLowerCase();
     if (accept.startsWith('en')) locale = 'en';
     else if (accept.startsWith('fr')) locale = 'fr';
   } catch {}
