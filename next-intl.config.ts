@@ -1,4 +1,4 @@
-import {defineConfig} from 'next-intl/config';
+import defineConfig from 'next-intl/config';
 
 export default defineConfig({
   locales: ['fr', 'en'],
