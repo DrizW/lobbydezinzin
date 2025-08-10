@@ -7,6 +7,10 @@ import Link from 'next/link';
 export default function Home() {
   const { t } = useTranslation('common');
 
+  // Récupère la liste des bénéfices de manière typée et sécurisée
+  const benefitsRaw = t('benefits.items', { returnObjects: true }) as unknown;
+  const benefitsItems: string[] = Array.isArray(benefitsRaw) ? (benefitsRaw as string[]) : [];
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Head>
@@ -36,7 +40,7 @@ export default function Home() {
         <div className="mt-8 max-w-2xl mx-auto">
           <h3 className="text-2xl font-semibold mb-4">{t('benefits.title')}</h3>
           <ul className="list-disc list-inside space-y-2">
-            {t('benefits.items', { returnObjects: true }).map((item: string, index: number) => (
+            {benefitsItems.map((item: string, index: number) => (
               <li key={index} className="text-gray-700">{item}</li>
             ))}
           </ul>
