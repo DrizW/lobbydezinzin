@@ -6,7 +6,6 @@ module.exports = {
   },
   fallbackLng: 'fr',
   supportedLngs: ['fr', 'en', 'es', 'ar'],
-  // Configuration pour la détection automatique de la langue
   detection: {
     order: ['cookie', 'header', 'navigator'],
     caches: ['cookie']

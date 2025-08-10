@@ -9,18 +9,5 @@
     "logout": "Logout"
   },
   "welcome": "Welcome to LobbyDeZinzin",
-  "description": "Your smart DNS solution to optimize your gaming experience",
-  "home": {
-    "title": "Change your game region with a single click",
-    "subtitle": "Optimize your Warzone matches with our intelligent DNS"
-  },
-  "benefits": {
-    "title": "Why Choose LobbyDeZinzin?",
-    "items": [
-      "Instant region change",
-      "Optimized matchmaking",
-      "No VPN required",
-      "Compatible with all consoles"
-    ]
-  }
+  "description": "Your smart DNS solution to optimize your gaming experience"
 }
