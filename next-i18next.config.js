@@ -1,13 +1,8 @@
 module.exports = {
   i18n: {
     defaultLocale: 'fr',
-    locales: ['fr', 'en', 'es', 'ar'],
-    localeDetection: true
+    locales: ['fr', 'en', 'es', 'ar']
   },
   fallbackLng: 'fr',
-  supportedLngs: ['fr', 'en', 'es', 'ar'],
-  detection: {
-    order: ['cookie', 'header', 'navigator'],
-    caches: ['cookie']
-  }
+  supportedLngs: ['fr', 'en', 'es', 'ar']
 };
