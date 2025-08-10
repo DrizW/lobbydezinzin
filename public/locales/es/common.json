@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "benefits": "Beneficios",
+    "help": "Ayuda",
+    "admin": "Panel de Administración",
+    "contact": "Contacto",
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión"
+  },
+  "welcome": "Bienvenido a LobbyDeZinzin",
+  "description": "Tu solución DNS inteligente para optimizar tu experiencia de juego",
+  "home": {
+    "title": "Cambia tu región de juego con un solo clic",
+    "subtitle": "Optimiza tus partidas de Warzone con nuestro DNS inteligente"
+  },
+  "benefits": {
+    "title": "¿Por qué elegir LobbyDeZinzin?",
+    "items": [
+      "Cambio de región instantáneo",
+      "Emparejamiento optimizado",
+      "No se requiere VPN",
+      "Compatible con todas las consolas"
+    ]
+  }
+}
