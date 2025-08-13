@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useState } from "react";
 import { useSession } from "next-auth/react";
 import ClientOnly from "../components/ClientOnly";
 import RegionSelector from "../components/RegionSelector";
