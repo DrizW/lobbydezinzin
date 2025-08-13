@@ -156,7 +156,7 @@ export default function DashboardPage() {
     <ClientOnly>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="mb-6 p-4 rounded bg-gray-800 text-gray-200 flex gap-3 flex-wrap">
+        <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50 text-gray-200 flex gap-3 flex-wrap shadow-lg">
           <button
             onClick={async () => {
               try {
@@ -169,14 +169,11 @@ export default function DashboardPage() {
                 }
               } catch { /* noop */ }
             }}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded"
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold shadow-lg hover:shadow-orange-500/25 transition-all duration-200 transform hover:scale-105"
           >
             Mot de passe oublié
           </button>
-          <Link href="/settings/security" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded">Changer le mot de passe</Link>
-          {resetSent && (
-            <span className="text-sm text-green-400">Email de réinitialisation envoyé (si l'adresse existe).</span>
-          )}
+          <Link href="/settings/security" className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-emerald-500/25 transition-all duration-200 transform hover:scale-105">Changer le mot de passe</Link>
         </div>
         {/* Header */}
         <div className="text-center mb-12 relative">
@@ -443,6 +440,17 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      {resetSent && (
+        <div aria-live="polite" className="fixed top-4 right-4 z-50">
+          <div className="flex items-start gap-3 bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-xl shadow-2xl border border-emerald-400/30 px-4 py-3 backdrop-blur-md">
+            <span className="text-xl">✅</span>
+            <div>
+              <div className="font-semibold">Email de réinitialisation envoyé</div>
+              <div className="text-emerald-100 text-sm">Si l'adresse existe, vous recevrez un lien dans quelques instants.</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </ClientOnly>
   );
