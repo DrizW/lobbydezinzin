@@ -1,6 +1,7 @@
 import "./globals.css";
 import Header from "./components/Header";
 import Providers from "./components/Providers";
+import CookieBanner from "./components/CookieBanner";
 import { ReactNode } from "react";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Providers>
           <Header />
           <main>{children}</main>
+          <CookieBanner />
         </Providers>
       </body>
     </html>
