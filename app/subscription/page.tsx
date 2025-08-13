@@ -126,27 +126,42 @@ export default function SubscriptionPage() {
           </div>
         ) : isSubscribed || isAdmin ? (
           <div className="flex justify-center mb-16">
-            <div className="max-w-2xl w-full text-center rounded-2xl p-10 bg-gradient-to-br from-emerald-700/40 to-emerald-900/40 border border-emerald-500/50 shadow-2xl">
-              <div className="inline-flex items-center gap-3 mb-4 px-4 py-2 rounded-full bg-emerald-600/20 border border-emerald-400/30 text-emerald-200">
-                <span className="text-xl">✅</span>
-                <span className="font-semibold">Premium actif</span>
+            <div className="w-full max-w-4xl rounded-3xl p-10 bg-gradient-to-br from-emerald-900/50 to-emerald-950/40 border border-emerald-400/20 shadow-[0_20px_60px_-20px_rgba(16,185,129,0.35)] backdrop-blur-xl">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-3 mb-5 px-5 py-2.5 rounded-full bg-emerald-500/15 ring-1 ring-inset ring-emerald-400/30 text-emerald-200">
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/30 text-white">✓</span>
+                  <span className="font-semibold tracking-tight">Premium actif</span>
+                </div>
+                <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-200 via-emerald-300 to-emerald-200 bg-clip-text text-transparent mb-3">
+                  Vous êtes déjà en Premium
+                </h3>
+                <p className="text-emerald-100/90 max-w-2xl mx-auto">Merci pour votre soutien. Votre accès aux régions optimisées est actif.</p>
+                {expiresAt && (
+                  <div className="mt-4 inline-flex px-4 py-1.5 rounded-full text-sm text-emerald-100/90 bg-emerald-500/10 ring-1 ring-emerald-400/20">
+                    Renouvellement le: {new Date(expiresAt).toLocaleString()}
+                  </div>
+                )}
               </div>
-              <h3 className="text-3xl font-bold text-emerald-300 mb-3">Vous êtes déjà en Premium</h3>
-              <p className="text-emerald-100/90 mb-6">Merci pour votre soutien. Votre accès aux régions optimisées est actif.</p>
-              {expiresAt && (
-                <p className="text-emerald-200/80 mb-8">Renouvellement le: {new Date(expiresAt).toLocaleString()}</p>
-              )}
-              <div className="grid md:grid-cols-3 gap-4 justify-center">
-                <div className="text-left bg-emerald-700/20 rounded-xl p-4 border border-emerald-500/30">
-                  <div className="font-semibold text-emerald-200 mb-2">Avantages</div>
-                  <ul className="text-emerald-100/90 text-sm space-y-1">
-                    <li>• Régions optimisées illimitées</li>
-                    <li>• Support prioritaire</li>
-                    <li>• Mises à jour automatiques</li>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="rounded-2xl p-6 bg-emerald-800/20 ring-1 ring-inset ring-emerald-500/20">
+                  <div className="font-semibold text-emerald-200 mb-3">Avantages</div>
+                  <ul className="text-emerald-100/90 text-sm space-y-2">
+                    <li className="flex items-center gap-2"><span className="text-emerald-300">✓</span><span>Régions optimisées illimitées</span></li>
+                    <li className="flex items-center gap-2"><span className="text-emerald-300">✓</span><span>Support prioritaire</span></li>
+                    <li className="flex items-center gap-2"><span className="text-emerald-300">✓</span><span>Mises à jour automatiques</span></li>
                   </ul>
                 </div>
-                <Link href="/dashboard" className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-emerald-500/25 transition-all duration-200 transform hover:scale-105">Aller au Dashboard</Link>
-                <Link href="/contact" className="px-6 py-3 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-gray-200 font-semibold border border-gray-600/60 transition-all duration-200">Support</Link>
+
+                <Link href="/dashboard" className="rounded-2xl p-6 bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-emerald-500/30 transition-all duration-200 flex items-center justify-center gap-3 transform hover:scale-[1.02]">
+                  <span>Aller au Dashboard</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M13.5 4.5h6v6m0-6L10.5 13.5m9-9L6 18"/></svg>
+                </Link>
+
+                <Link href="/contact" className="rounded-2xl p-6 bg-gradient-to-br from-gray-800/80 to-gray-900/80 text-gray-200 font-semibold ring-1 ring-inset ring-gray-600/40 hover:ring-emerald-400/40 transition-all duration-200 flex items-center justify-center gap-3">
+                  <span>Support</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 opacity-80"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zm1 13h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+                </Link>
               </div>
             </div>
           </div>
