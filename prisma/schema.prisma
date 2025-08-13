@@ -34,6 +34,8 @@ model User {
   twoFactorSecret  String?
 
   auditLogs      AuditLog[]
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
 }
 
 model UserSettings {
