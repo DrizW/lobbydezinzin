@@ -167,3 +167,15 @@ model ContactRequest {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+/// Notes internes pour le support/admin
+model AdminNote {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  authorId  String?
+  text      String
+  createdAt DateTime @default(now())
+  
+  @@index([userId, createdAt])
+}

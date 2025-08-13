@@ -192,13 +192,24 @@ export default function AdminPage() {
               </div>
             </div>
           </Link>
-          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 opacity-50">
-            <div className="text-center">
-              <div className="text-4xl mb-3">⚙️</div>
-              <div className="text-xl font-bold text-gray-400 mb-2">Paramètres</div>
-              <div className="text-gray-500 text-sm">Bientôt disponible</div>
+          <Link href="/admin/subscriptions">
+            <div className="bg-gradient-to-br from-emerald-800/50 to-emerald-900/50 p-6 rounded-xl border border-emerald-700/50 hover:border-emerald-600/70 transition-all cursor-pointer">
+              <div className="text-center">
+                <div className="text-4xl mb-3">💳</div>
+                <div className="text-xl font-bold text-emerald-400 mb-2">Abonnements</div>
+                <div className="text-gray-400 text-sm">Filtrer, annuler, expirer</div>
+              </div>
             </div>
-          </div>
+          </Link>
+          <Link href="/api/admin/export?type=users" target="_blank">
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 hover:border-orange-600/70 transition-all cursor-pointer">
+              <div className="text-center">
+                <div className="text-4xl mb-3">📄</div>
+                <div className="text-xl font-bold text-white mb-2">Export CSV</div>
+                <div className="text-gray-400 text-sm">Utilisateurs, DNS, Transactions</div>
+              </div>
+            </div>
+          </Link>
         </div>
 
         {/* Liste des utilisateurs */}
