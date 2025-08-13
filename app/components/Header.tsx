@@ -2,15 +2,22 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Logo from "./Logo";
 
 export default function Header() {
   const { data: session, status } = useSession();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  const handleSignOut = () => {
-    signOut({ callbackUrl: "/" });
+  const handleSignOut = async () => {
+    try {
+      await signOut({ redirect: false });
+    } finally {
+      setShowMenu(false);
+      router.replace("/login");
+    }
   };
 
   // Fermer le menu quand on clique en dehors
