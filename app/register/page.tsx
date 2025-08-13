@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 function isStrongPassword(pw: string) {
   return pw.length >= 8 && /[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw);
@@ -30,8 +31,20 @@ export default function RegisterPage() {
       body: JSON.stringify({ email, password }),
     });
     if (res.ok) {
-      setSuccess(true);
-      setTimeout(() => router.push("/login"), 1500);
+      // Connexion immédiate après création du compte
+      const login = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (login?.ok && !login.error) {
+        router.replace("/dashboard");
+        return;
+      }
+
+      // Fallback: si la connexion échoue, aller sur la page de login
+      router.replace("/login");
     } else {
       try {
         const data = await res.json();
