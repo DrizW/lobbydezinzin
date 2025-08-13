@@ -25,5 +25,3 @@ export async function POST(request: NextRequest) {
 }
 
 export const GET = (base as any).GET;
-
-export { handler as GET, handler as POST }; 
