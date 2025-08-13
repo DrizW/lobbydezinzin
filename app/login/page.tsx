@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -20,7 +19,6 @@ export default function LoginPage() {
     const res = await signIn("credentials", {
       email,
       password,
-      otp,
       redirect: false, // Ne pas rediriger automatiquement
     });
     
@@ -58,15 +56,6 @@ export default function LoginPage() {
           value={password}
           onChange={e => setPassword(e.target.value)}
           required
-        />
-        <input
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          placeholder="Code 2FA (si activé)"
-          className="w-full mb-4 p-2 border border-gray-700 bg-gray-900 text-white rounded"
-          value={otp}
-          onChange={e => setOtp(e.target.value)}
         />
         <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-500 font-semibold mb-2">
           Se connecter
