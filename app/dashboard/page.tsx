@@ -155,6 +155,10 @@ export default function DashboardPage() {
     <ClientOnly>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="mb-6 p-4 rounded bg-gray-800 text-gray-200 flex gap-3 flex-wrap">
+          <Link href="/reset" className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded">Mot de passe oublié</Link>
+          <Link href="/settings/security" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded">Activer 2FA</Link>
+        </div>
         {/* Header */}
         <div className="text-center mb-12 relative">
           {/* Bouton Admin (visible seulement pour les admins) */}
