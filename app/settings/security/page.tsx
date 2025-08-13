@@ -8,6 +8,7 @@ export default function SecuritySettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [pwdDone, setPwdDone] = useState(false);
+  const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {}, []);
 
@@ -17,7 +18,12 @@ export default function SecuritySettingsPage() {
     e.preventDefault(); setError(""); setPwdDone(false);
     if (newPassword !== confirmPassword) { setError('Les mots de passe ne correspondent pas'); return; }
     const res = await fetch('/api/auth/change-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ currentPassword, newPassword }) });
-    if (res.ok) setPwdDone(true); else {
+    if (res.ok) {
+      setPwdDone(true);
+      setCountdown(5);
+      const interval = setInterval(()=>setCountdown(c=>c-1), 1000);
+      setTimeout(async ()=>{ clearInterval(interval); window.location.replace('/login'); }, 5000);
+    } else {
       const data = await res.json().catch(()=>({}));
       setError(data?.error || 'Erreur lors du changement de mot de passe');
     }
@@ -35,7 +41,7 @@ export default function SecuritySettingsPage() {
           <input type="password" placeholder="Confirmer le nouveau mot de passe" className="w-full mb-3 p-2 border border-gray-700 bg-gray-900 text-white rounded" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} required />
           <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded font-semibold">Mettre à jour</button>
         </form>
-        {pwdDone && <div className="text-green-400 mt-3">Mot de passe mis à jour.</div>}
+        {pwdDone && <div className="text-green-400 mt-3">Mot de passe mis à jour. Déconnexion dans {countdown}s...</div>}
         {error && <div className="text-red-400 mt-3">{error}</div>}
       </div>
     </div>

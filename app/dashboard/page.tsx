@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import ClientOnly from "../components/ClientOnly";
 import RegionSelector from "../components/RegionSelector";
@@ -28,6 +29,7 @@ type CountriesResponse = {
 
 export default function DashboardPage() {
   const { data: session } = useSession();
+  const [resetSent, setResetSent] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);
   const [requiresSubscription, setRequiresSubscription] = useState(false);
@@ -156,8 +158,23 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-6 p-4 rounded bg-gray-800 text-gray-200 flex gap-3 flex-wrap">
-          <Link href="/reset" className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded">Mot de passe oublié</Link>
+          <button
+            onClick={async () => {
+              try {
+                const email = session?.user?.email;
+                if (!email) { window.location.href = "/reset"; return; }
+                const res = await fetch('/api/auth/request-reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+                if (res.ok) setResetSent(true);
+              } catch { /* noop */ }
+            }}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded"
+          >
+            Mot de passe oublié
+          </button>
           <Link href="/settings/security" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded">Changer le mot de passe</Link>
+          {resetSent && (
+            <span className="text-sm text-gray-300">Email de réinitialisation envoyé (si l'adresse existe).</span>
+          )}
         </div>
         {/* Header */}
         <div className="text-center mb-12 relative">
