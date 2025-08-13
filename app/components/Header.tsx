@@ -1,12 +1,14 @@
 "use client";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
+import { useState as useReactState } from "react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "./Logo";
 
 export default function Header() {
   const { data: session, status } = useSession();
+  const [theme, setTheme] = useReactState<'dark'|'light'>(typeof window !== 'undefined' && localStorage.getItem('ldz-theme') === 'light' ? 'light' : 'dark');
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -52,6 +54,13 @@ export default function Header() {
             <Link href="/countries" className="text-gray-300 hover:text-orange-400 transition-colors duration-200 font-medium">
               Aide
             </Link>
+            <button
+              onClick={() => { const next = theme === 'dark' ? 'light' : 'dark'; setTheme(next); if (typeof window !== 'undefined') { localStorage.setItem('ldz-theme', next); document.documentElement.classList.toggle('light', next==='light'); } }}
+              className="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700/40 transition-colors"
+              aria-label="Basculer le thème"
+            >
+              {theme === 'dark' ? '🌙' : '☀️'}
+            </button>
             
             {status === "loading" ? (
               <div className="bg-gray-700 px-4 py-2 rounded-lg text-gray-300 animate-pulse">
