@@ -28,6 +28,12 @@ model User {
   image          String?
   accounts       Account[]
   sessions       Session[]
+
+  // 2FA (TOTP)
+  twoFactorEnabled Boolean   @default(false)
+  twoFactorSecret  String?
+
+  auditLogs      AuditLog[]
 }
 
 model UserSettings {
@@ -99,6 +105,40 @@ model VerificationToken {
   expires   DateTime
 
   @@unique([identifier, token])
+}
+
+/// Email verification token for custom flows (credentials provider)
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+}
+
+/// Password reset token for credential users
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+}
+
+/// Audit logs for security-sensitive operations
+model AuditLog {
+  id        String   @id @default(cuid())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId    String?
+  action    String
+  ip        String?
+  userAgent String?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, action, createdAt])
 }
 
 model DNSLog {
