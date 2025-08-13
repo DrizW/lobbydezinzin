@@ -36,6 +36,7 @@ model User {
   auditLogs      AuditLog[]
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
+  adminNotes              AdminNote[]
 }
 
 model UserSettings {
