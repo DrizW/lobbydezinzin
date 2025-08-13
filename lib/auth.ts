@@ -3,6 +3,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./prisma";
 import bcrypt from "bcrypt";
 import { NextAuthOptions } from "next-auth";
+import speakeasy from "speakeasy";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -44,6 +45,15 @@ export const authOptions: NextAuthOptions = {
         if (!isValid) {
           console.log("❌ Mot de passe incorrect");
           return null;
+        }
+
+        // 2FA: si activée, exige un code OTP valide dans les credentials
+        if (user.twoFactorEnabled) {
+          const otp = (credentials as any)?.otp as string | undefined;
+          if (!otp || !speakeasy.totp.verify({ secret: user.twoFactorSecret || "", encoding: "base32", token: otp, window: 1 })) {
+            console.log("❌ 2FA requise ou code invalide");
+            return null;
+          }
         }
 
         console.log("✅ Connexion réussie pour:", user.email);
