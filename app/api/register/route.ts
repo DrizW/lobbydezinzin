@@ -7,24 +7,31 @@ function isStrongPassword(pw: string) {
 }
 
 export async function POST(req: Request) {
-  const { email, password } = await req.json();
-  if (!email || !password) {
-    return NextResponse.json({ error: "Email et mot de passe requis" }, { status: 400 });
+  try {
+    const { email, password } = await req.json();
+    if (!email || !password) {
+      return NextResponse.json({ error: "Email et mot de passe requis" }, { status: 400 });
+    }
+    if (!isStrongPassword(password)) {
+      return NextResponse.json({ error: "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre." }, { status: 400 });
+    }
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      return NextResponse.json({ error: "Email déjà utilisé" }, { status: 400 });
+    }
+    const hashed = await bcrypt.hash(password, 10);
+    await prisma.user.create({
+      data: {
+        email,
+        password: hashed,
+        role: "USER",
+      },
+    });
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: "Impossible de créer l'utilisateur pour le moment.", details: error?.message ?? "" },
+      { status: 500 }
+    );
   }
-  if (!isStrongPassword(password)) {
-    return NextResponse.json({ error: "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre." }, { status: 400 });
-  }
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) {
-    return NextResponse.json({ error: "Email déjà utilisé" }, { status: 400 });
-  }
-  const hashed = await bcrypt.hash(password, 10);
-  await prisma.user.create({
-    data: {
-      email,
-      password: hashed,
-      role: "USER",
-    },
-  });
-  return NextResponse.json({ success: true });
-} 
+}

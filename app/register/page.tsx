@@ -33,8 +33,12 @@ export default function RegisterPage() {
       setSuccess(true);
       setTimeout(() => router.push("/login"), 1500);
     } else {
-      const data = await res.json();
-      setError(data.error || "Erreur lors de l'inscription");
+      try {
+        const data = await res.json();
+        setError(data?.error || "Erreur lors de l'inscription");
+      } catch {
+        setError("Erreur lors de l'inscription");
+      }
     }
   };
 
