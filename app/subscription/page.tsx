@@ -136,7 +136,15 @@ export default function SubscriptionPage() {
               {expiresAt && (
                 <p className="text-emerald-200/80 mb-8">Renouvellement le: {new Date(expiresAt).toLocaleString()}</p>
               )}
-              <div className="flex justify-center gap-4">
+              <div className="grid md:grid-cols-3 gap-4 justify-center">
+                <div className="text-left bg-emerald-700/20 rounded-xl p-4 border border-emerald-500/30">
+                  <div className="font-semibold text-emerald-200 mb-2">Avantages</div>
+                  <ul className="text-emerald-100/90 text-sm space-y-1">
+                    <li>• Régions optimisées illimitées</li>
+                    <li>• Support prioritaire</li>
+                    <li>• Mises à jour automatiques</li>
+                  </ul>
+                </div>
                 <Link href="/dashboard" className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-emerald-500/25 transition-all duration-200 transform hover:scale-105">Aller au Dashboard</Link>
                 <Link href="/contact" className="px-6 py-3 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-gray-200 font-semibold border border-gray-600/60 transition-all duration-200">Support</Link>
               </div>
