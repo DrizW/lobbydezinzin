@@ -21,7 +21,11 @@ export async function POST(req: Request) {
   await recordAudit({ userId: user.id, action: "password.reset.request" });
 
   const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/reset?token=${token}`;
-  await sendMail(email, "Réinitialisation de mot de passe", `<p>Réinitialisez votre mot de passe: <a href="${resetUrl}">${resetUrl}</a></p>`);
+  try {
+    await sendMail(email, "Réinitialisation de mot de passe", `<p>Réinitialisez votre mot de passe: <a href="${resetUrl}">${resetUrl}</a></p>`);
+  } catch {
+    // Ne pas révéler d'info; considérer comme succès côté UX même si l'envoi email échoue
+  }
   return NextResponse.json({ success: true });
 }
 

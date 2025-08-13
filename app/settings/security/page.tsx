@@ -34,7 +34,6 @@ export default function SecuritySettingsPage() {
       <div className="bg-gray-800 p-6 rounded-lg w-full max-w-lg">
         <h1 className="text-2xl font-bold text-blue-300 mb-4">Sécurité du compte</h1>
         <h2 className="text-lg text-gray-200 mb-4">Changer le mot de passe</h2>
-        <h2 className="text-lg text-gray-200 mb-2">Changer le mot de passe</h2>
         <form onSubmit={changePassword}>
           <input type="password" placeholder="Mot de passe actuel" className="w-full mb-3 p-2 border border-gray-700 bg-gray-900 text-white rounded" value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} required />
           <input type="password" placeholder="Nouveau mot de passe" className="w-full mb-3 p-2 border border-gray-700 bg-gray-900 text-white rounded" value={newPassword} onChange={e=>setNewPassword(e.target.value)} required />

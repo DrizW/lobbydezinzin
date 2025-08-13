@@ -163,7 +163,10 @@ export default function DashboardPage() {
                 const email = session?.user?.email;
                 if (!email) { window.location.href = "/reset"; return; }
                 const res = await fetch('/api/auth/request-reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
-                if (res.ok) setResetSent(true);
+                if (res.ok) {
+                  setResetSent(true);
+                  setTimeout(()=>setResetSent(false), 5000);
+                }
               } catch { /* noop */ }
             }}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded"
@@ -172,7 +175,7 @@ export default function DashboardPage() {
           </button>
           <Link href="/settings/security" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded">Changer le mot de passe</Link>
           {resetSent && (
-            <span className="text-sm text-gray-300">Email de réinitialisation envoyé (si l'adresse existe).</span>
+            <span className="text-sm text-green-400">Email de réinitialisation envoyé (si l'adresse existe).</span>
           )}
         </div>
         {/* Header */}
