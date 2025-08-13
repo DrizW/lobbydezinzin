@@ -56,9 +56,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900">
-      <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-lg shadow-lg w-96">
-        <h1 className="text-2xl font-bold mb-4 text-blue-300">Créer un compte</h1>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black p-6">
+      <form onSubmit={handleSubmit} className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700/50 w-full max-w-md">
+        <h1 className="text-3xl font-bold mb-6">
+          <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Créer un compte</span>
+        </h1>
         {error && <div className="text-red-400 mb-2">{error}</div>}
         {success && <div className="text-green-400 mb-2">Compte créé ! Redirection...</div>}
         <input
@@ -84,7 +86,7 @@ export default function RegisterPage() {
         )}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-500 font-semibold mb-2 disabled:opacity-50"
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold shadow-lg hover:shadow-orange-500/25 transition-all duration-200 transform hover:scale-105 mb-2 disabled:opacity-50"
           disabled={!strong}
         >
           S'inscrire

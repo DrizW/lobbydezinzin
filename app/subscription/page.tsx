@@ -126,15 +126,19 @@ export default function SubscriptionPage() {
           </div>
         ) : isSubscribed || isAdmin ? (
           <div className="flex justify-center mb-16">
-            <div className="max-w-2xl w-full bg-gradient-to-br from-emerald-700/30 to-emerald-900/30 rounded-2xl border border-emerald-500/50 p-10 text-center">
-              <h3 className="text-3xl font-bold text-emerald-300 mb-4">Vous êtes déjà en Premium</h3>
-              <p className="text-gray-300 mb-6">Merci pour votre soutien. Votre accès aux régions optimisées est actif.</p>
+            <div className="max-w-2xl w-full text-center rounded-2xl p-10 bg-gradient-to-br from-emerald-700/40 to-emerald-900/40 border border-emerald-500/50 shadow-2xl">
+              <div className="inline-flex items-center gap-3 mb-4 px-4 py-2 rounded-full bg-emerald-600/20 border border-emerald-400/30 text-emerald-200">
+                <span className="text-xl">✅</span>
+                <span className="font-semibold">Premium actif</span>
+              </div>
+              <h3 className="text-3xl font-bold text-emerald-300 mb-3">Vous êtes déjà en Premium</h3>
+              <p className="text-emerald-100/90 mb-6">Merci pour votre soutien. Votre accès aux régions optimisées est actif.</p>
               {expiresAt && (
-                <p className="text-gray-400 mb-8">Renouvellement le: {new Date(expiresAt).toLocaleString()}</p>
+                <p className="text-emerald-200/80 mb-8">Renouvellement le: {new Date(expiresAt).toLocaleString()}</p>
               )}
               <div className="flex justify-center gap-4">
-                <Link href="/dashboard" className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-lg font-semibold">Aller au Dashboard</Link>
-                <Link href="/contact" className="border border-gray-600 hover:border-emerald-400 text-gray-200 px-6 py-3 rounded-lg font-semibold">Support</Link>
+                <Link href="/dashboard" className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-emerald-500/25 transition-all duration-200 transform hover:scale-105">Aller au Dashboard</Link>
+                <Link href="/contact" className="px-6 py-3 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-gray-200 font-semibold border border-gray-600/60 transition-all duration-200">Support</Link>
               </div>
             </div>
           </div>
