@@ -14,6 +14,7 @@ export default function SecuritySettingsPage() {
   const [otp, setOtp] = useState("");
   const [twoFAEnabled, setTwoFAEnabled] = useState<boolean>(false);
   const [showDisableConfirm, setShowDisableConfirm] = useState(false);
+  const [confirmPwd, setConfirmPwd] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -123,13 +124,14 @@ export default function SecuritySettingsPage() {
                 <button
                   onClick={async ()=>{
                     setError("");
-                    const r = await fetch('/api/security/disable-2fa', { method: 'POST' });
+                    const r = await fetch('/api/security/disable-2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ currentPassword: confirmPwd }) });
                     if (r.ok) {
                       setTwoFAEnabled(false);
-                      setQr(""); setOtp("");
+                      setQr(""); setOtp(""); setConfirmPwd("");
                       setShowDisableConfirm(false);
                     } else {
-                      setError('Impossible de désactiver la 2FA');
+                      const d = await r.json().catch(()=>({}));
+                      setError(d?.error || 'Impossible de désactiver la 2FA');
                       setShowDisableConfirm(false);
                     }
                   }}
@@ -139,6 +141,9 @@ export default function SecuritySettingsPage() {
                   onClick={()=> setShowDisableConfirm(false)}
                   className="flex-1 py-3 rounded-xl bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-semibold shadow-lg hover:shadow-gray-500/25 transition-all duration-200"
                 >Annuler</button>
+              </div>
+              <div className="mt-4">
+                <input type="password" value={confirmPwd} onChange={e=>setConfirmPwd(e.target.value)} placeholder="Mot de passe actuel" className="w-full p-2 border border-gray-700 bg-gray-900 text-white rounded" />
               </div>
             </div>
           </div>
