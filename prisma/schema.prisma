@@ -38,6 +38,7 @@ model User {
   passwordResetTokens     PasswordResetToken[]
   adminNotes              AdminNote[]
   backupCodes             TwoFactorBackupCode[]
+  userSessions            UserSession[]
 }
 
 model UserSettings {
@@ -156,6 +157,26 @@ model TwoFactorBackupCode {
   usedAt    DateTime?
 
   @@index([userId, used])
+}
+
+/// Sessions actives des utilisateurs avec informations détaillées
+model UserSession {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  sessionToken String   @unique
+  deviceName   String?  // Nom de l'appareil (ex: "iPhone 15", "Chrome sur Windows")
+  deviceType   String?  // Type d'appareil (mobile, desktop, tablet)
+  browser      String?  // Navigateur (Chrome, Firefox, Safari, etc.)
+  os           String?  // Système d'exploitation (Windows, macOS, iOS, Android)
+  ip           String?  // Adresse IP
+  location     String?  // Localisation approximative
+  isCurrent    Boolean  @default(false) // Session actuelle
+  lastActivity DateTime @default(now())
+  createdAt    DateTime @default(now())
+  
+  @@index([userId, isCurrent])
+  @@index([userId, lastActivity])
 }
 
 model DNSLog {

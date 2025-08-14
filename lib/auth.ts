@@ -6,6 +6,7 @@ import { NextAuthOptions } from "next-auth";
 import speakeasy from "speakeasy";
 import { rateLimit } from "@/lib/rateLimit";
 import { recordAudit } from "@/lib/audit";
+import { getDeviceInfoFromRequest } from "@/lib/device-info";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -137,6 +138,51 @@ export const authOptions: NextAuthOptions = {
       if (url.startsWith(baseUrl)) return url;
       else if (url.startsWith("/")) return `${baseUrl}${url}`;
       return baseUrl + "/dashboard";
+    },
+    async signIn({ user, account, profile, email, credentials }) {
+      // Enregistrer la session après une connexion réussie
+      if (user && account?.type === 'credentials') {
+        try {
+          const deviceInfo = getDeviceInfoFromRequest(credentials?.req as any);
+          
+          // Marquer toutes les autres sessions comme non-actuelles
+          await prisma.userSession.updateMany({
+            where: { userId: user.id },
+            data: { isCurrent: false }
+          });
+
+          // Créer la nouvelle session
+          await prisma.userSession.create({
+            data: {
+              userId: user.id,
+              sessionToken: account.providerAccountId || `session_${Date.now()}`,
+              isCurrent: true,
+              deviceName: deviceInfo.deviceName,
+              deviceType: deviceInfo.deviceType,
+              browser: deviceInfo.browser,
+              os: deviceInfo.os,
+              ip: deviceInfo.ip
+            }
+          });
+
+          // Enregistrer l'audit de nouvelle connexion
+          await recordAudit({
+            userId: user.id,
+            action: 'NEW_LOGIN',
+            ip: deviceInfo.ip,
+            userAgent: credentials?.req?.headers?.get?.('user-agent'),
+            details: {
+              deviceName: deviceInfo.deviceName,
+              deviceType: deviceInfo.deviceType,
+              browser: deviceInfo.browser,
+              os: deviceInfo.os
+            }
+          });
+        } catch (error) {
+          console.error('Erreur lors de l\'enregistrement de la session:', error);
+        }
+      }
+      return true;
     },
   },
   pages: {
