@@ -285,13 +285,33 @@ export default function AdminPage() {
                         )}
                         
                         {user.role !== "ADMIN" && (
-                          <button
-                            onClick={() => deleteUser(user.id, user.email)}
-                            disabled={actionLoading === user.id}
-                            className="px-4 py-2 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50"
-                          >
-                            Supprimer
-                          </button>
+                          <>
+                            <button
+                              onClick={async () => {
+                                setActionLoading(user.id);
+                                try {
+                                  const res = await fetch('/api/admin/disable-2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id }) });
+                                  if (!res.ok) alert('Echec de la désactivation 2FA');
+                                } catch {
+                                  alert('Erreur réseau');
+                                } finally {
+                                  setActionLoading(null);
+                                }
+                              }}
+                              disabled={actionLoading === user.id}
+                              className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-500/20 text-gray-300 hover:bg-gray-500/30 transition-colors disabled:opacity-50"
+                            >
+                              Supprimer 2FA
+                            </button>
+
+                            <button
+                              onClick={() => deleteUser(user.id, user.email)}
+                              disabled={actionLoading === user.id}
+                              className="px-4 py-2 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                            >
+                              Supprimer
+                            </button>
+                          </>
                         )}
                         
                         {user.role === "ADMIN" && (
