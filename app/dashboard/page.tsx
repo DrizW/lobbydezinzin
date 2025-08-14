@@ -101,6 +101,7 @@ export default function DashboardPage() {
 
   const updateRegionStats = (region: string) => {
     const regionData = {
+      'south-africa': { name: "Afrique du Sud", flag: "🇿🇦", kdAverage: 0.65, lobbiesTested: 20, kdRange: "0.5-0.8", timezone: "Africa/Johannesburg" },
       nigeria: { name: "Nigeria", flag: "🇳🇬", kdAverage: 0.75, lobbiesTested: 24, kdRange: "0.6-0.9", timezone: "Africa/Lagos" },
       taiwan: { name: "Taiwan", flag: "🇹🇼", kdAverage: 0.85, lobbiesTested: 18, kdRange: "0.7-1.0", timezone: "Asia/Taipei" },
       morocco: { name: "Maroc", flag: "🇲🇦", kdAverage: 0.95, lobbiesTested: 21, kdRange: "0.8-1.1", timezone: "Africa/Casablanca" },
