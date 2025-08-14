@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Flag from "./Flag";
 import { useSession } from "next-auth/react";
 
 // Mapping des régions avec leurs informations (South Africa actif, autres en stand-by)
@@ -176,7 +177,7 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                 <span className="text-3xl hidden md:inline">{currentRegion.flag}</span>
+                 <span className="hidden md:inline"><Flag country={selectedRegion || currentRegion.name} size={28} /></span>
                 <div className="text-left">
                   <div className="text-white font-bold text-lg">{currentRegion.name}</div>
                   <div className="text-gray-400 text-sm">{currentRegion.description} • KD {currentRegion.kdRange}</div>
@@ -212,7 +213,7 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <span className="text-2xl">{region.flag}</span>
+                      <Flag country={key || region.name} size={24} />
                       <div>
                         <div className="text-white font-medium">{region.name}</div>
                         <div className="text-gray-400 text-sm">{region.description} • KD {region.kdRange}</div>
