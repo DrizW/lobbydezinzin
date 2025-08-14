@@ -280,7 +280,7 @@ export default function CookieBanner() {
                     pertinents selon vos intérêts.
                   </p>
                 </div>
-              </div>
+          </div>
 
               <div className="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t border-gray-700">
                 <button
@@ -301,10 +301,10 @@ export default function CookieBanner() {
                 >
                   Enregistrer mes préférences
                 </button>
-              </div>
-            </div>
           </div>
         </div>
+      </div>
+    </div>
       )}
     </>
   );

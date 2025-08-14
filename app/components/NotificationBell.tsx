@@ -12,6 +12,10 @@ interface Notification {
   read: boolean;
   actionUrl?: string;
   actionLabel?: string;
+  action?: {
+    label: string;
+    url: string;
+  };
 }
 
 export default function NotificationBell() {
@@ -85,9 +89,10 @@ export default function NotificationBell() {
   };
 
   const handleAction = (notification: Notification) => {
-    if (notification.actionUrl) {
+    const actionUrl = notification.actionUrl || notification.action?.url;
+    if (actionUrl) {
       markAsRead(notification.id);
-      router.push(notification.actionUrl);
+      router.push(actionUrl);
       setIsOpen(false);
     }
   };
@@ -191,14 +196,14 @@ export default function NotificationBell() {
                       <p className="text-sm text-gray-300 mt-1">
                         {notification.message}
                       </p>
-                      {notification.action && (
-                        <button
-                          onClick={() => handleAction(notification)}
-                          className="text-xs text-orange-400 hover:text-orange-300 transition-colors mt-2"
-                        >
-                          {notification.action.label} →
-                        </button>
-                      )}
+                                             {(notification.action || notification.actionLabel) && (
+                         <button
+                           onClick={() => handleAction(notification)}
+                           className="text-xs text-orange-400 hover:text-orange-300 transition-colors mt-2"
+                         >
+                           {notification.action?.label || notification.actionLabel} →
+                         </button>
+                       )}
                     </div>
                   </div>
                 </div>
@@ -210,10 +215,21 @@ export default function NotificationBell() {
           {notifications.length > 0 && (
             <div className="p-3 border-t border-gray-700/50 bg-gray-800/50">
               <button
-                onClick={() => {
-                  notificationService.clear();
-                  loadNotifications();
-                }}
+                                 onClick={() => {
+                   // Supprimer toutes les notifications via l'API
+                   notifications.forEach(async (notification) => {
+                     try {
+                       await fetch('/api/notifications', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ action: 'delete', notificationId: notification.id })
+                       });
+                     } catch (error) {
+                       console.error('Erreur lors de la suppression:', error);
+                     }
+                   });
+                   loadNotifications();
+                 }}
                 className="text-xs text-gray-400 hover:text-red-400 transition-colors"
               >
                 Effacer toutes les notifications
