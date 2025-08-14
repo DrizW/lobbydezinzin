@@ -9,25 +9,30 @@ import Logo from "./Logo";
 export default function Header() {
   const { data: session, status } = useSession();
   const [theme, setTheme] = useReactState<'dark'|'light'>(typeof window !== 'undefined' && localStorage.getItem('ldz-theme') === 'light' ? 'light' : 'dark');
-  const [showMenu, setShowMenu] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const handleSignOut = async () => {
     try {
       await signOut({ redirect: false });
     } finally {
-      setShowMenu(false);
+      setAccountMenuOpen(false);
+      setMobileMenuOpen(false);
       router.replace("/login");
     }
   };
 
-  // Fermer le menu quand on clique en dehors
+  // Fermer les menus quand on clique en dehors
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowMenu(false);
-      }
+      const target = event.target as Node;
+      const outsideAccount = accountMenuRef.current && !accountMenuRef.current.contains(target);
+      const outsideMobile = mobileMenuRef.current && !mobileMenuRef.current.contains(target);
+      if (outsideAccount) setAccountMenuOpen(false);
+      if (outsideMobile) setMobileMenuOpen(false);
     }
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -67,24 +72,24 @@ export default function Header() {
                 Chargement...
               </div>
             ) : session ? (
-              <div className="relative" ref={menuRef}>
+              <div className="relative" ref={accountMenuRef}>
                 <button 
-                  onClick={() => setShowMenu(!showMenu)}
+                  onClick={() => setAccountMenuOpen(!accountMenuOpen)}
                   className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-6 py-2 rounded-lg text-white font-medium flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                   {session.user?.email || "Mon compte"}
-                  <svg className={`w-4 h-4 transition-transform duration-200 ${showMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-4 h-4 transition-transform duration-200 ${accountMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
                 
-                {showMenu && (
+                {accountMenuOpen && (
                   <div className="absolute right-0 mt-3 w-56 bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-700/50 py-2 z-50">
                     <Link 
                       href="/dashboard" 
                       className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200"
-                      onClick={() => setShowMenu(false)}
+                      onClick={() => setAccountMenuOpen(false)}
                     >
                       <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -94,7 +99,7 @@ export default function Header() {
                     <Link 
                       href="/countries" 
                       className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200"
-                      onClick={() => setShowMenu(false)}
+                      onClick={() => setAccountMenuOpen(false)}
                     >
                       <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -104,7 +109,7 @@ export default function Header() {
                     <Link 
                       href="/contact" 
                       className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200"
-                      onClick={() => setShowMenu(false)}
+                      onClick={() => setAccountMenuOpen(false)}
                     >
                       <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-2.697-.413l-3.191 1.063a.75.75 0 01-.96-.96l1.063-3.191A8.955 8.955 0 013 12a8 8 0 018-8 8 8 0 018 8z" />
@@ -115,7 +120,7 @@ export default function Header() {
                       <Link 
                         href="/admin" 
                         className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200"
-                        onClick={() => setShowMenu(false)}
+                        onClick={() => setAccountMenuOpen(false)}
                       >
                         <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -147,9 +152,9 @@ export default function Header() {
           </nav>
 
           {/* Menu mobile */}
-          <div className="md:hidden" ref={menuRef}>
+          <div className="md:hidden" ref={mobileMenuRef}>
             <button 
-              onClick={() => setShowMenu(!showMenu)}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="text-gray-300 hover:text-orange-400 p-2"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,26 +163,26 @@ export default function Header() {
             </button>
             
             {/* Menu mobile déroulant */}
-            {showMenu && (
+            {mobileMenuOpen && (
               <div className="absolute right-4 top-16 w-64 bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-700/50 py-2 z-50">
                 <Link 
                   href="/#features" 
                   className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200"
-                  onClick={() => setShowMenu(false)}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   Avantages
                 </Link>
                 <Link 
                   href="/countries" 
                   className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200"
-                  onClick={() => setShowMenu(false)}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   Aide
                 </Link>
                 <Link 
                   href="/contact" 
                   className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200"
-                  onClick={() => setShowMenu(false)}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   Contact
                 </Link>
@@ -188,7 +193,7 @@ export default function Header() {
                     <Link 
                       href="/dashboard" 
                       className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200"
-                      onClick={() => setShowMenu(false)}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -199,7 +204,7 @@ export default function Header() {
                       <Link 
                         href="/admin" 
                         className="flex items-center px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200"
-                        onClick={() => setShowMenu(false)}
+                        onClick={() => setMobileMenuOpen(false)}
                       >
                         <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -225,7 +230,7 @@ export default function Header() {
                     <Link 
                       href="/login"
                       className="flex items-center px-4 py-3 text-sm text-orange-400 hover:bg-gray-700/50 transition-colors duration-200"
-                      onClick={() => setShowMenu(false)}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Connexion
                     </Link>
