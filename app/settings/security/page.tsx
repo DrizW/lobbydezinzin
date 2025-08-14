@@ -15,7 +15,15 @@ export default function SecuritySettingsPage() {
   const [twoFAEnabled, setTwoFAEnabled] = useState<boolean>(false);
 
   useEffect(() => {
-    // TODO: récupérer l'état réel via session/me si dispo
+    (async () => {
+      try {
+        const r = await fetch('/api/security/status');
+        if (r.ok) {
+          const d = await r.json();
+          setTwoFAEnabled(!!d.twoFactorEnabled);
+        }
+      } catch {}
+    })();
   }, []);
 
   const requestOtp = async () => {
