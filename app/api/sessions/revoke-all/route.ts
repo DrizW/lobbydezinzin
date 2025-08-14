@@ -40,8 +40,7 @@ export async function POST(request: NextRequest) {
     await recordAudit({
       userId: user.id,
       action: 'ALL_SESSIONS_REVOKED',
-      ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
-      userAgent: request.headers.get('user-agent') || 'unknown',
+      req: request,
       details: {
         sessionsRevoked: sessionsToDelete
       }

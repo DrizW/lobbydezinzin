@@ -169,8 +169,7 @@ export const authOptions: NextAuthOptions = {
           await recordAudit({
             userId: user.id,
             action: 'NEW_LOGIN',
-            ip: deviceInfo.ip,
-            userAgent: credentials?.req?.headers?.get?.('user-agent'),
+            req: credentials?.req as any,
             details: {
               deviceName: deviceInfo.deviceName,
               deviceType: deviceInfo.deviceType,
