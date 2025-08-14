@@ -170,7 +170,7 @@ export const authOptions: NextAuthOptions = {
           await recordAudit({
             userId: user.id,
             action: 'NEW_LOGIN',
-            req: credentials?.req,
+            req: credentials?.req as any,
             details: {
               deviceName: deviceInfo.deviceName,
               deviceType: deviceInfo.deviceType,
