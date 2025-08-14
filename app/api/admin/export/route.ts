@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   const type = req.nextUrl.searchParams.get('type'); // users|dns|transactions
   let rows: any[] = [];
   if (type === 'users') {
-    const users = await prisma.user.findMany({ select: { id: true, email: true, role: true, createdAt: true } as any });
+    const users = await prisma.user.findMany({ select: { id: true, email: true, role: true, emailVerified: true, twoFactorEnabled: true } as any });
     rows = users;
   } else if (type === 'dns') {
     const logs = await prisma.dNSLog.findMany({ select: { id: true, userId: true, domain: true, region: true, clientIP: true, timestamp: true } as any });
