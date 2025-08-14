@@ -131,7 +131,7 @@ if (typeof window !== 'undefined') {
 }
 
 // Abonne la page pour récupérer le token et l’enregistrer en state
-export function useRegisterTurnstile(setter: (t: string) => void) {
+function useRegisterTurnstile(setter: (t: string) => void) {
   useEffect(() => {
     const handler = (e: any) => setter(e.detail as string);
     window.addEventListener('turnstile-register-token', handler);
