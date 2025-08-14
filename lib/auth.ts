@@ -7,6 +7,7 @@ import speakeasy from "speakeasy";
 import { rateLimit } from "@/lib/rateLimit";
 import { recordAudit } from "@/lib/audit";
 import { getDeviceInfoFromRequest } from "@/lib/device-info";
+import { notificationService } from "@/lib/notifications";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -177,6 +178,19 @@ export const authOptions: NextAuthOptions = {
               os: deviceInfo.os
             }
           });
+
+          // Créer une notification de nouvelle connexion
+          try {
+            notificationService.createNewLoginNotification({
+              deviceName: deviceInfo.deviceName,
+              deviceType: deviceInfo.deviceType,
+              browser: deviceInfo.browser,
+              os: deviceInfo.os,
+              ip: deviceInfo.ip
+            });
+          } catch (error) {
+            console.error('Erreur lors de la création de la notification:', error);
+          }
         } catch (error) {
           console.error('Erreur lors de l\'enregistrement de la session:', error);
         }

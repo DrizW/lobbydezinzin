@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAnalytics } from "@/lib/analytics";
+import { notificationService } from "@/lib/notifications";
 
 // GET - Récupérer les paramètres utilisateur
 export async function GET(request: NextRequest) {
@@ -133,17 +134,33 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Enregistrer l'événement analytics si la région a changé
-    if (oldRegion !== selectedCountry) {
-      await recordAnalytics({
-        event: 'region_changed',
-        category: 'region',
-        action: 'changed',
-        label: `${oldRegion} → ${selectedCountry}`,
-        userId: session.user.id,
-        req: request
-      });
-    }
+                    // Enregistrer l'événement analytics si la région a changé
+                if (oldRegion !== selectedCountry) {
+                  await recordAnalytics({
+                    event: 'region_changed',
+                    category: 'region',
+                    action: 'changed',
+                    label: `${oldRegion} → ${selectedCountry}`,
+                    userId: session.user.id,
+                    req: request
+                  });
+
+                  // Créer une notification de changement de région
+                  try {
+                    notificationService.add({
+                      type: 'info',
+                      title: 'Région mise à jour',
+                      message: `Votre région a été changée de ${oldRegion} vers ${selectedCountry}`,
+                      read: false,
+                      action: {
+                        label: 'Voir le dashboard',
+                        url: '/dashboard'
+                      }
+                    });
+                  } catch (error) {
+                    console.error('Erreur lors de la création de la notification:', error);
+                  }
+                }
 
     console.log(`🌍 ${user.email} a changé de région: ${selectedCountry}`);
 

@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { recordAudit } from "@/lib/audit";
 import { rateLimit } from "@/lib/rateLimit";
 import { recordAnalytics } from "@/lib/analytics";
+import { notificationService } from "@/lib/notifications";
 
 function isStrongPassword(pw: string) {
   return pw.length >= 8 && /[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw);
@@ -72,14 +73,30 @@ export async function POST(req: Request) {
       await sendMail(email, "Vérifiez votre email", `<p>Validez votre compte: <a href="${verifyUrl}">${verifyUrl}</a></p>`);
     } catch {}
 
-    // Enregistrer l'événement analytics
-    await recordAnalytics({
-      event: 'user_registered',
-      category: 'user',
-      action: 'created',
-      userId: user.id,
-      req: req as any
-    });
+                // Enregistrer l'événement analytics
+            await recordAnalytics({
+              event: 'user_registered',
+              category: 'user',
+              action: 'created',
+              userId: user.id,
+              req: req as any
+            });
+
+            // Créer une notification de bienvenue
+            try {
+              notificationService.add({
+                type: 'success',
+                title: 'Bienvenue sur LobbyDeZinzin !',
+                message: 'Votre compte a été créé avec succès. Commencez par configurer votre région pour optimiser vos performances.',
+                read: false,
+                action: {
+                  label: 'Configurer ma région',
+                  url: '/dashboard'
+                }
+              });
+            } catch (error) {
+              console.error('Erreur lors de la création de la notification:', error);
+            }
 
     return NextResponse.json({ success: true, verifyEmailSent: true });
   } catch (error: any) {
