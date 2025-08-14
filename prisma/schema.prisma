@@ -39,6 +39,8 @@ model User {
   adminNotes              AdminNote[]
   backupCodes             TwoFactorBackupCode[]
   userSessions            UserSession[]
+  cookieConsents          CookieConsent[]
+  analyticsEvents         AnalyticsEvent[]
 }
 
 model UserSettings {
@@ -214,4 +216,46 @@ model AdminNote {
   createdAt DateTime @default(now())
   
   @@index([userId, createdAt])
+}
+
+/// Préférences cookies et consentement RGPD
+model CookieConsent {
+  id        String   @id @default(cuid())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+  sessionId String?  // Pour les utilisateurs non connectés
+  essential Boolean  @default(true)  // Cookies essentiels (toujours acceptés)
+  analytics Boolean  @default(false) // Cookies d'analyse
+  marketing Boolean  @default(false) // Cookies marketing
+  performance Boolean @default(false) // Cookies de performance
+  preferences Boolean @default(false) // Cookies de préférences
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([sessionId])
+  @@index([createdAt])
+}
+
+/// Journal des événements analytics
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId    String?
+  sessionId String?  // Pour les utilisateurs non connectés
+  event     String   // register, subscribe, churn, region_change, etc.
+  category  String   // user, subscription, region, etc.
+  action    String   // created, updated, deleted, etc.
+  label     String?  // Détails supplémentaires
+  value     Float?   // Valeur numérique si applicable
+  properties Json?   // Propriétés supplémentaires
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  
+  @@index([userId, event, createdAt])
+  @@index([event, createdAt])
+  @@index([category, action])
 }

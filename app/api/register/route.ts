@@ -5,6 +5,7 @@ import { sendMail } from "@/lib/email";
 import { NextResponse } from "next/server";
 import { recordAudit } from "@/lib/audit";
 import { rateLimit } from "@/lib/rateLimit";
+import { recordAnalytics } from "@/lib/analytics";
 
 function isStrongPassword(pw: string) {
   return pw.length >= 8 && /[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw);
@@ -70,6 +71,15 @@ export async function POST(req: Request) {
     try {
       await sendMail(email, "Vérifiez votre email", `<p>Validez votre compte: <a href="${verifyUrl}">${verifyUrl}</a></p>`);
     } catch {}
+
+    // Enregistrer l'événement analytics
+    await recordAnalytics({
+      event: 'user_registered',
+      category: 'user',
+      action: 'created',
+      userId: user.id,
+      req: req as any
+    });
 
     return NextResponse.json({ success: true, verifyEmailSent: true });
   } catch (error: any) {

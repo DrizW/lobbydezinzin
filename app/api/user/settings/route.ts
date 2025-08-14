@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { recordAnalytics } from "@/lib/analytics";
 
 // GET - Récupérer les paramètres utilisateur
 export async function GET(request: NextRequest) {
@@ -111,6 +112,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Récupérer l'ancienne région pour l'analytics
+    const oldSettings = await prisma.userSettings.findUnique({
+      where: { userId: session.user.id }
+    });
+    const oldRegion = oldSettings?.selectedCountry || 'nigeria';
+
     // Mettre à jour ou créer les paramètres
     const settings = await prisma.userSettings.upsert({
       where: { userId: session.user.id },
@@ -125,6 +132,18 @@ export async function POST(request: NextRequest) {
         autoRotate: autoRotate || false
       }
     });
+
+    // Enregistrer l'événement analytics si la région a changé
+    if (oldRegion !== selectedCountry) {
+      await recordAnalytics({
+        event: 'region_changed',
+        category: 'region',
+        action: 'changed',
+        label: `${oldRegion} → ${selectedCountry}`,
+        userId: session.user.id,
+        req: request
+      });
+    }
 
     console.log(`🌍 ${user.email} a changé de région: ${selectedCountry}`);
 

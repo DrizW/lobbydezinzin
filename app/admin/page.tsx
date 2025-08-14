@@ -173,7 +173,7 @@ export default function AdminPage() {
         </div>
 
         {/* Navigation Admin */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Link href="/admin/ip-management">
             <div className="bg-gradient-to-br from-blue-800/50 to-blue-900/50 p-6 rounded-xl border border-blue-700/50 hover:border-blue-600/70 transition-all cursor-pointer">
               <div className="text-center">
@@ -198,6 +198,15 @@ export default function AdminPage() {
                 <div className="text-4xl mb-3">💳</div>
                 <div className="text-xl font-bold text-emerald-400 mb-2">Abonnements</div>
                 <div className="text-gray-400 text-sm">Filtrer, annuler, expirer</div>
+              </div>
+            </div>
+          </Link>
+          <Link href="/admin/analytics">
+            <div className="bg-gradient-to-br from-indigo-800/50 to-indigo-900/50 p-6 rounded-xl border border-indigo-700/50 hover:border-indigo-600/70 transition-all cursor-pointer">
+              <div className="text-center">
+                <div className="text-4xl mb-3">📊</div>
+                <div className="text-xl font-bold text-indigo-400 mb-2">Analytics</div>
+                <div className="text-gray-400 text-sm">Événements & statistiques</div>
               </div>
             </div>
           </Link>
