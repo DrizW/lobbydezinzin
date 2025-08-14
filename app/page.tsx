@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Logo from "./components/Logo";
+import Flag from "./components/Flag";
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -165,7 +166,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border border-gray-700/50 text-center group hover:border-blue-500/50 transition-all duration-300">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-white">🇳🇬</span>
+                <Flag country="ng" size={28} />
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">Nigeria</h3>
               <p className="text-gray-300 mb-4">Lobbies ultra-faciles</p>
@@ -174,7 +175,7 @@ export default function HomePage() {
 
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border border-gray-700/50 text-center group hover:border-blue-500/50 transition-all duration-300">
               <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-white">🇹🇼</span>
+                <Flag country="tw" size={28} />
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">Taiwan</h3>
               <p className="text-gray-300 mb-4">Lobbies très faciles</p>
@@ -183,7 +184,7 @@ export default function HomePage() {
 
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border border-gray-700/50 text-center group hover:border-blue-500/50 transition-all duration-300">
               <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-white">🇮🇱</span>
+                <Flag country="il" size={28} />
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">Israël</h3>
               <p className="text-gray-300 mb-4">Lobbies faciles</p>
