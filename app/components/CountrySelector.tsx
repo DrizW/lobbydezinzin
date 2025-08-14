@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import CountryFlag from "./CountryFlag";
 
 interface Country {
   id: string;
@@ -290,16 +291,11 @@ export default function CountrySelector() {
 
               <div className="flex items-center justify-between mb-4 pr-16">
                 <div className="flex items-center space-x-3">
-                  {/* Emoji fallback visible en mobile; SVG en desktop */}
+                  {/* Emoji fallback visible en mobile; SVG en desktop via composant Flag */}
                   <span className="text-3xl md:hidden">{country.flag}</span>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`https://flagcdn.com/${(country.name || '').toLowerCase().includes('maroc') ? 'ma' : (country.name || '').toLowerCase().includes('nigeria') ? 'ng' : (country.name || '').toLowerCase().includes('taiwan') ? 'tw' : (country.name || '').toLowerCase().includes('tha' ) ? 'th' : (country.name || '').toLowerCase().includes('kenya') ? 'ke' : (country.name || '').toLowerCase().includes('afrique') ? 'za' : ''}.svg`}
-                    alt={`Drapeau ${country.name}`}
-                    className="hidden md:inline-block w-7 h-7 rounded-sm shadow-sm"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
+                  <span className="hidden md:inline-block align-middle">
+                    <CountryFlag countryName={country.name} flagField={country.flag} />
+                  </span>
                   <div>
                     <h3 className="text-xl font-bold text-white">{country.name}</h3>
                     <p className="text-sm text-gray-400">{country.description}</p>
