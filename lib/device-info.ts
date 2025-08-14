@@ -53,15 +53,49 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
   };
 }
 
-export function getDeviceInfoFromRequest(request: Request): DeviceInfo {
-  const userAgent = request.headers.get('user-agent') || '';
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  const realIp = request.headers.get('x-real-ip');
+export function getDeviceInfoFromRequest(request: any): DeviceInfo {
+  // Valeurs par défaut si request est undefined
+  if (!request) {
+    return {
+      deviceName: 'Appareil inconnu',
+      deviceType: 'desktop',
+      browser: 'Inconnu',
+      os: 'Inconnu',
+      ip: undefined
+    };
+  }
+
+  // Essayer différentes façons d'accéder aux headers selon le contexte
+  let userAgent = '';
+  let ip = undefined;
+
+  try {
+    // Si c'est un objet Request standard
+    if (request.headers && typeof request.headers.get === 'function') {
+      userAgent = request.headers.get('user-agent') || '';
+      const forwardedFor = request.headers.get('x-forwarded-for');
+      const realIp = request.headers.get('x-real-ip');
+      ip = realIp || forwardedFor?.split(',')[0] || undefined;
+    }
+    // Si c'est un objet avec headers comme propriété
+    else if (request.headers && typeof request.headers === 'object') {
+      userAgent = request.headers['user-agent'] || '';
+      const forwardedFor = request.headers['x-forwarded-for'];
+      const realIp = request.headers['x-real-ip'];
+      ip = realIp || forwardedFor?.split(',')[0] || undefined;
+    }
+    // Si c'est un objet avec user-agent directement
+    else if (request['user-agent']) {
+      userAgent = request['user-agent'];
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'extraction des informations de device:', error);
+  }
   
   const deviceInfo = parseUserAgent(userAgent);
   
   return {
     ...deviceInfo,
-    ip: realIp || forwardedFor?.split(',')[0] || undefined
+    ip
   };
 }

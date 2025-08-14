@@ -144,7 +144,7 @@ export const authOptions: NextAuthOptions = {
       // Enregistrer la session après une connexion réussie
       if (user && account?.type === 'credentials') {
         try {
-          const deviceInfo = getDeviceInfoFromRequest(credentials?.req as any);
+          const deviceInfo = getDeviceInfoFromRequest(credentials?.req);
           
           // Marquer toutes les autres sessions comme non-actuelles
           await prisma.userSession.updateMany({
@@ -170,7 +170,7 @@ export const authOptions: NextAuthOptions = {
           await recordAudit({
             userId: user.id,
             action: 'NEW_LOGIN',
-            req: credentials?.req as any,
+            req: credentials?.req,
             details: {
               deviceName: deviceInfo.deviceName,
               deviceType: deviceInfo.deviceType,
@@ -181,13 +181,14 @@ export const authOptions: NextAuthOptions = {
 
           // Créer une notification de nouvelle connexion
           try {
-            createServerNewLoginNotification(user.id, {
+            await createServerNewLoginNotification(user.id, {
               deviceName: deviceInfo.deviceName,
               deviceType: deviceInfo.deviceType,
               browser: deviceInfo.browser,
               os: deviceInfo.os,
               ip: deviceInfo.ip
             });
+            console.log(`🔔 Notification créée pour ${user.email}`);
           } catch (error) {
             console.error('Erreur lors de la création de la notification:', error);
           }
