@@ -2,7 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { notificationService, Notification } from '@/lib/notifications';
+
+interface Notification {
+  id: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  message: string;
+  createdAt: string;
+  read: boolean;
+  actionUrl?: string;
+  actionLabel?: string;
+}
 
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -14,48 +24,75 @@ export default function NotificationBell() {
     // Charger les notifications au montage
     loadNotifications();
 
-    // Écouter les nouvelles notifications
-    const handleNewNotification = () => {
-      loadNotifications();
-    };
-
-    window.addEventListener('notification-added', handleNewNotification);
+    // Recharger les notifications toutes les 30 secondes
+    const interval = setInterval(loadNotifications, 30000);
     
     return () => {
-      window.removeEventListener('notification-added', handleNewNotification);
+      clearInterval(interval);
     };
   }, []);
 
-  const loadNotifications = () => {
-    const allNotifications = notificationService.getAll();
-    setNotifications(allNotifications);
-    setUnreadCount(notificationService.getUnreadCount());
+  const loadNotifications = async () => {
+    try {
+      const response = await fetch('/api/notifications');
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data.notifications || []);
+        setUnreadCount(data.notifications?.filter((n: Notification) => !n.read).length || 0);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des notifications:', error);
+    }
   };
 
-  const markAsRead = (id: string) => {
-    notificationService.markAsRead(id);
-    loadNotifications();
+  const markAsRead = async (id: string) => {
+    try {
+      await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'markAsRead', notificationId: id })
+      });
+      loadNotifications();
+    } catch (error) {
+      console.error('Erreur lors du marquage comme lu:', error);
+    }
   };
 
-  const markAllAsRead = () => {
-    notificationService.markAllAsRead();
-    loadNotifications();
+  const markAllAsRead = async () => {
+    try {
+      await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'markAllAsRead' })
+      });
+      loadNotifications();
+    } catch (error) {
+      console.error('Erreur lors du marquage comme lu:', error);
+    }
   };
 
-  const removeNotification = (id: string) => {
-    notificationService.remove(id);
-    loadNotifications();
+  const removeNotification = async (id: string) => {
+    try {
+      await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', notificationId: id })
+      });
+      loadNotifications();
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+    }
   };
 
   const handleAction = (notification: Notification) => {
-    if (notification.action) {
+    if (notification.actionUrl) {
       markAsRead(notification.id);
-      router.push(notification.action.url);
+      router.push(notification.actionUrl);
       setIsOpen(false);
     }
   };
 
-  const formatTime = (timestamp: Date) => {
+  const formatTime = (timestamp: string) => {
     const now = new Date();
     const diff = now.getTime() - new Date(timestamp).getTime();
     const minutes = Math.floor(diff / 60000);

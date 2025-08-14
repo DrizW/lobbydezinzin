@@ -132,3 +132,48 @@ export const notificationService = {
     });
   }
 };
+
+// Fonction pour créer des notifications côté serveur
+// Ces notifications seront récupérées côté client lors de la prochaine visite
+export async function createServerNotification(userId: string, notification: Omit<Notification, 'id' | 'timestamp'>): Promise<void> {
+  try {
+    const { prisma } = await import('./prisma');
+    
+    await prisma.userNotification.create({
+      data: {
+        userId,
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        read: notification.read,
+        actionUrl: notification.action?.url,
+        actionLabel: notification.action?.label
+      }
+    });
+  } catch (error) {
+    console.error('Erreur lors de la création de la notification en base:', error);
+  }
+}
+
+// Fonction pour créer une notification de nouvelle connexion côté serveur
+export async function createServerNewLoginNotification(userId: string, deviceInfo: {
+  deviceName: string;
+  deviceType: string;
+  browser: string;
+  os: string;
+  ip?: string;
+  location?: string;
+}): Promise<void> {
+  const message = `Connexion depuis ${deviceInfo.deviceName} (${deviceInfo.browser} sur ${deviceInfo.os})`;
+  
+  await createServerNotification(userId, {
+    type: 'warning',
+    title: 'Nouvelle connexion détectée',
+    message,
+    read: false,
+    action: {
+      label: 'Voir les sessions',
+      url: '/sessions'
+    }
+  });
+}

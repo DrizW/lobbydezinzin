@@ -7,7 +7,7 @@ import speakeasy from "speakeasy";
 import { rateLimit } from "@/lib/rateLimit";
 import { recordAudit } from "@/lib/audit";
 import { getDeviceInfoFromRequest } from "@/lib/device-info";
-import { notificationService } from "@/lib/notifications";
+import { createServerNewLoginNotification } from "@/lib/notifications";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -181,7 +181,7 @@ export const authOptions: NextAuthOptions = {
 
           // Créer une notification de nouvelle connexion
           try {
-            notificationService.createNewLoginNotification({
+            createServerNewLoginNotification(user.id, {
               deviceName: deviceInfo.deviceName,
               deviceType: deviceInfo.deviceType,
               browser: deviceInfo.browser,

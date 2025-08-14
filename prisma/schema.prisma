@@ -41,6 +41,7 @@ model User {
   userSessions            UserSession[]
   cookieConsents          CookieConsent[]
   analyticsEvents         AnalyticsEvent[]
+  notifications           UserNotification[]
 }
 
 model UserSettings {
@@ -258,4 +259,21 @@ model AnalyticsEvent {
   @@index([userId, event, createdAt])
   @@index([event, createdAt])
   @@index([category, action])
+}
+
+/// Notifications utilisateur
+model UserNotification {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  type      String   // info, success, warning, error
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  actionUrl String?  // URL d'action optionnelle
+  actionLabel String? // Label du bouton d'action
+  createdAt DateTime @default(now())
+  
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAnalytics } from "@/lib/analytics";
-import { notificationService } from "@/lib/notifications";
+import { createServerNotification } from "@/lib/notifications";
 
 // GET - Récupérer les paramètres utilisateur
 export async function GET(request: NextRequest) {
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
 
                   // Créer une notification de changement de région
                   try {
-                    notificationService.add({
+                    createServerNotification(session.user.id, {
                       type: 'info',
                       title: 'Région mise à jour',
                       message: `Votre région a été changée de ${oldRegion} vers ${selectedCountry}`,

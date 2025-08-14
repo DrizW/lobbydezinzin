@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import { recordAudit } from "@/lib/audit";
 import { rateLimit } from "@/lib/rateLimit";
 import { recordAnalytics } from "@/lib/analytics";
-import { notificationService } from "@/lib/notifications";
+import { createServerNotification } from "@/lib/notifications";
 
 function isStrongPassword(pw: string) {
   return pw.length >= 8 && /[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw);
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
 
             // Créer une notification de bienvenue
             try {
-              notificationService.add({
+              createServerNotification(user.id, {
                 type: 'success',
                 title: 'Bienvenue sur LobbyDeZinzin !',
                 message: 'Votre compte a été créé avec succès. Commencez par configurer votre région pour optimiser vos performances.',
