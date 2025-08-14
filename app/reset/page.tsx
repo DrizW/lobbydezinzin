@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ResetPage() {
   const [email, setEmail] = useState("");
@@ -8,6 +8,13 @@ export default function ResetPage() {
   const [password, setPassword] = useState("");
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+
+  // Auto-lecture du token dans l'URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get("token");
+    if (t) setToken(t);
+  }, []);
 
   const request = async (e: React.FormEvent) => {
     e.preventDefault(); setError("");
@@ -35,7 +42,9 @@ export default function ResetPage() {
           <div className="text-green-400">Mot de passe changé. Vous pouvez vous connecter.</div>
         ) : (
           <form onSubmit={reset}>
-            <input type="text" placeholder="Token reçu par email" className="w-full mb-3 p-2 border border-gray-700 bg-gray-900 text-white rounded" value={token} onChange={e=>setToken(e.target.value)} required />
+            {!token && (
+              <input type="text" placeholder="Token reçu par email" className="w-full mb-3 p-2 border border-gray-700 bg-gray-900 text-white rounded" value={token} onChange={e=>setToken(e.target.value)} required />
+            )}
             <input type="password" placeholder="Nouveau mot de passe" className="w-full mb-3 p-2 border border-gray-700 bg-gray-900 text-white rounded" value={password} onChange={e=>setPassword(e.target.value)} required />
             <button type="submit" className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-500 font-semibold">Réinitialiser</button>
           </form>

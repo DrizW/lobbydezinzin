@@ -9,6 +9,15 @@ export async function sendMail(to: string, subject: string, html: string): Promi
   const pass = process.env.SMTP_PASS || "";
   const from = process.env.SMTP_FROM || "no-reply@lobbydezinzin.com";
 
+  // Fallback: si aucun SMTP n'est configuré, simuler l'envoi (utile en dev/VM sans SMTP)
+  if (!host) {
+    try {
+      console.log("✉️ [Email simulé]", { to, subject });
+      console.log(html);
+    } catch {}
+    return;
+  }
+
   const transporter = nodemailer.createTransport({
     host,
     port,
