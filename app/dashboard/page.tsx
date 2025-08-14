@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import ClientOnly from "../components/ClientOnly";
 import RegionSelector from "../components/RegionSelector";
+import Flag from "../components/Flag";
 
 type Country = {
   id: string;
@@ -223,7 +224,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">{regionStats.flag}</span>
+                <Flag country={regionStats.flag || regionStats.name} size={20} />
               </div>
             </div>
           </div>
