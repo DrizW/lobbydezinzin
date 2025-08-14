@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [totp, setTotp] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -19,6 +20,7 @@ export default function LoginPage() {
     const res = await signIn("credentials", {
       email,
       password,
+      totp: totp || undefined,
       redirect: false, // Ne pas rediriger automatiquement
     });
     
@@ -26,7 +28,12 @@ export default function LoginPage() {
     
     if (res?.error) {
       console.log("❌ Erreur de connexion:", res.error);
-      setError("Email ou mot de passe incorrect");
+      // Afficher un message guide si 2FA est activée
+      if (res.error.includes?.("TWO_FACTOR_REQUIRED")) {
+        setError("Code 2FA requis ou invalide. Veuillez renseigner le code de votre application d'authentification.");
+      } else {
+        setError("Email ou mot de passe incorrect");
+      }
     } else if (res?.ok) {
       console.log("✅ Connexion réussie, redirection vers /dashboard");
       // Redirection forcée vers le dashboard
@@ -58,6 +65,14 @@ export default function LoginPage() {
           value={password}
           onChange={e => setPassword(e.target.value)}
           required
+        />
+        <input
+          type="text"
+          inputMode="numeric"
+          placeholder="Code 2FA (si activé)"
+          className="w-full mb-4 p-2 border border-gray-700 bg-gray-900 text-white rounded"
+          value={totp}
+          onChange={e => setTotp(e.target.value)}
         />
         <button type="submit" className="w-full py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold shadow-lg hover:shadow-orange-500/25 transition-all duration-200 transform hover:scale-105 mb-2">Se connecter</button>
         <div className="mt-4 text-center">
