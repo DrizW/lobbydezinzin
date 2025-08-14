@@ -70,22 +70,29 @@ export default function SecuritySettingsPage() {
     <div className="min-h-screen bg-gray-900 p-6 flex items-center justify-center">
       <div className="bg-gray-800 p-6 rounded-lg w-full max-w-lg">
         <h1 className="text-2xl font-bold text-blue-300 mb-4">Sécurité du compte</h1>
-        <h2 className="text-lg text-gray-200 mb-4">Activer l’authentification à deux facteurs (2FA)</h2>
-        <div className="mb-6">
-          {!qr ? (
-            <button onClick={requestOtp} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold shadow-lg hover:shadow-indigo-500/25 transition-all duration-200 transform hover:scale-105 mb-3">Générer le QR</button>
-          ) : (
-            <div className="mb-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={qr} alt="QR 2FA" className="mx-auto w-48 h-48 border border-gray-700 rounded" />
+        {!twoFAEnabled ? (
+          <>
+            <h2 className="text-lg text-gray-200 mb-4">Activer l’authentification à deux facteurs (2FA)</h2>
+            <div className="mb-6">
+              {!qr ? (
+                <button onClick={requestOtp} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold shadow-lg hover:shadow-indigo-500/25 transition-all duration-200 transform hover:scale-105 mb-3">Générer le QR</button>
+              ) : (
+                <div className="mb-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={qr} alt="QR 2FA" className="mx-auto w-48 h-48 border border-gray-700 rounded" />
+                </div>
+              )}
+              <form onSubmit={enable} className="flex gap-2 items-center">
+                <input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="Code à 6 chiffres" className="flex-1 p-2 border border-gray-700 bg-gray-900 text-white rounded" value={otp} onChange={e=>setOtp(e.target.value)} />
+                <button type="submit" className="py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-emerald-500/25 transition-all duration-200 transform hover:scale-105">Activer</button>
+              </form>
             </div>
-          )}
-          <form onSubmit={enable} className="flex gap-2 items-center">
-            <input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="Code à 6 chiffres" className="flex-1 p-2 border border-gray-700 bg-gray-900 text-white rounded" value={otp} onChange={e=>setOtp(e.target.value)} />
-            <button type="submit" className="py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-emerald-500/25 transition-all duration-200 transform hover:scale-105">Activer</button>
-          </form>
-          {twoFAEnabled && <div className="text-green-400 mt-2">2FA activée</div>}
-        </div>
+          </>
+        ) : (
+          <div className="mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-900/40 text-emerald-300 px-3 py-1 text-sm">2FA activée</div>
+          </div>
+        )}
 
         {twoFAEnabled && (
           <div className="mb-6">
