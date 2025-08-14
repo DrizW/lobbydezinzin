@@ -176,7 +176,7 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <span className="text-3xl">{currentRegion.flag}</span>
+                 <span className="text-3xl hidden md:inline">{currentRegion.flag}</span>
                 <div className="text-left">
                   <div className="text-white font-bold text-lg">{currentRegion.name}</div>
                   <div className="text-gray-400 text-sm">{currentRegion.description} • KD {currentRegion.kdRange}</div>
