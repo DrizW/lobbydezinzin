@@ -13,6 +13,7 @@ export default function SecuritySettingsPage() {
   const [qr, setQr] = useState<string>("");
   const [otp, setOtp] = useState("");
   const [twoFAEnabled, setTwoFAEnabled] = useState<boolean>(false);
+  const [showDisableConfirm, setShowDisableConfirm] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -106,18 +107,40 @@ export default function SecuritySettingsPage() {
             >Générer et télécharger</button>
 
             <button
-              onClick={async ()=>{
-                setError("");
-                const r = await fetch('/api/security/disable-2fa', { method: 'POST' });
-                if (r.ok) {
-                  setTwoFAEnabled(false);
-                  setQr(""); setOtp("");
-                } else {
-                  setError('Impossible de désactiver la 2FA');
-                }
-              }}
+              onClick={()=> setShowDisableConfirm(true)}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-semibold shadow-lg hover:shadow-gray-500/25 transition-all duration-200 transform hover:scale-105"
             >Désactiver la 2FA</button>
+          </div>
+        )}
+
+        {showDisableConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={()=>setShowDisableConfirm(false)} />
+            <div className="relative bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md p-6 mx-4 animate-[fadeIn_.15s_ease-out]">
+              <h4 className="text-xl font-semibold text-gray-100 mb-2">Êtes-vous sûr ?</h4>
+              <p className="text-gray-300 mb-5">La désactivation du 2FA supprimera la protection TOTP et invalidera vos codes de secours.</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={async ()=>{
+                    setError("");
+                    const r = await fetch('/api/security/disable-2fa', { method: 'POST' });
+                    if (r.ok) {
+                      setTwoFAEnabled(false);
+                      setQr(""); setOtp("");
+                      setShowDisableConfirm(false);
+                    } else {
+                      setError('Impossible de désactiver la 2FA');
+                      setShowDisableConfirm(false);
+                    }
+                  }}
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold shadow-lg hover:shadow-rose-500/25 transition-all duration-200"
+                >Oui, désactiver</button>
+                <button
+                  onClick={()=> setShowDisableConfirm(false)}
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-semibold shadow-lg hover:shadow-gray-500/25 transition-all duration-200"
+                >Annuler</button>
+              </div>
+            </div>
           </div>
         )}
 
