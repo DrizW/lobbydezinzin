@@ -48,6 +48,18 @@ export default function CookieBanner() {
         setShowBanner(true);
       }
     }
+
+    // Écouter l'événement pour ouvrir les préférences depuis le footer
+    const handleShowPreferences = () => {
+      setShowBanner(true);
+      setShowPreferences(true);
+    };
+
+    window.addEventListener('show-cookie-preferences', handleShowPreferences);
+
+    return () => {
+      window.removeEventListener('show-cookie-preferences', handleShowPreferences);
+    };
   }, []);
 
   const saveConsent = async (prefs: CookiePreferences) => {
