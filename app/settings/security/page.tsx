@@ -62,7 +62,7 @@ export default function SecuritySettingsPage() {
         <h2 className="text-lg text-gray-200 mb-4">Activer l’authentification à deux facteurs (2FA)</h2>
         <div className="mb-6">
           {!qr ? (
-            <button onClick={requestOtp} className="mb-3 py-2 px-4 rounded bg-indigo-600 hover:bg-indigo-500 text-white">Générer le QR</button>
+            <button onClick={requestOtp} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold shadow-lg hover:shadow-indigo-500/25 transition-all duration-200 transform hover:scale-105 mb-3">Générer le QR</button>
           ) : (
             <div className="mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -71,10 +71,47 @@ export default function SecuritySettingsPage() {
           )}
           <form onSubmit={enable} className="flex gap-2 items-center">
             <input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="Code à 6 chiffres" className="flex-1 p-2 border border-gray-700 bg-gray-900 text-white rounded" value={otp} onChange={e=>setOtp(e.target.value)} />
-            <button type="submit" className="py-2 px-4 rounded bg-indigo-600 hover:bg-indigo-500 text-white">Activer</button>
+            <button type="submit" className="py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-emerald-500/25 transition-all duration-200 transform hover:scale-105">Activer</button>
           </form>
           {twoFAEnabled && <div className="text-green-400 mt-2">2FA activée</div>}
         </div>
+
+        {twoFAEnabled && (
+          <div className="mb-6">
+            <h3 className="text-md text-gray-200 mb-2">Codes de secours</h3>
+            <button
+              onClick={async ()=>{
+                setError("");
+                const r = await fetch('/api/security/generate-backup-codes', { method: 'POST' });
+                if (r.ok) {
+                  const data = await r.json();
+                  const blob = new Blob([data.codes.join('\n')], { type: 'text/plain' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url; a.download = 'codes-secours.txt'; a.click();
+                  URL.revokeObjectURL(url);
+                } else {
+                  setError('Impossible de générer les codes');
+                }
+              }}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold shadow-lg hover:shadow-orange-500/25 transition-all duration-200 transform hover:scale-105 mb-3"
+            >Générer et télécharger</button>
+
+            <button
+              onClick={async ()=>{
+                setError("");
+                const r = await fetch('/api/security/disable-2fa', { method: 'POST' });
+                if (r.ok) {
+                  setTwoFAEnabled(false);
+                  setQr(""); setOtp("");
+                } else {
+                  setError('Impossible de désactiver la 2FA');
+                }
+              }}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-semibold shadow-lg hover:shadow-gray-500/25 transition-all duration-200 transform hover:scale-105"
+            >Désactiver la 2FA</button>
+          </div>
+        )}
 
         <h2 className="text-lg text-gray-200 mb-4">Changer le mot de passe</h2>
         <form onSubmit={changePassword}>

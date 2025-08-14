@@ -37,6 +37,7 @@ model User {
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
   adminNotes              AdminNote[]
+  backupCodes             TwoFactorBackupCode[]
 }
 
 model UserSettings {
@@ -142,6 +143,19 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([userId, action, createdAt])
+}
+
+/// Codes de secours 2FA (hashés)
+model TwoFactorBackupCode {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  codeHash  String
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  usedAt    DateTime?
+
+  @@index([userId, used])
 }
 
 model DNSLog {

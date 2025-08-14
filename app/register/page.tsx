@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
@@ -13,7 +13,11 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string>("");
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY as string | undefined;
   const router = useRouter();
+  // branche le listener Turnstile si présent
+  useRegisterTurnstile(setCaptchaToken);
 
   const strong = isStrongPassword(password);
 
@@ -28,7 +32,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, captchaToken: captchaToken || undefined }),
     });
     if (res.ok) {
       // Connexion immédiate après création du compte
@@ -79,6 +83,15 @@ export default function RegisterPage() {
           onChange={e => setPassword(e.target.value)}
           required
         />
+        {siteKey && (
+          <div className="mb-3">
+            <div
+              className="cf-turnstile"
+              data-sitekey={siteKey}
+              data-callback="onTurnstileVerifyRegister"
+            />
+          </div>
+        )}
         {!strong && password.length > 0 && (
           <div className="text-yellow-400 text-sm mb-2">
             Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre.
@@ -98,3 +111,30 @@ export default function RegisterPage() {
     </div>
   );
 } 
+
+// Injecte le script Turnstile et le callback global si un site key est présent
+if (typeof window !== 'undefined') {
+  const sk = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY as string | undefined;
+  if (sk && !(window as any).__turnstileScriptLoaded) {
+    (window as any).__turnstileScriptLoaded = true;
+    const s = document.createElement('script');
+    s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    s.async = true; s.defer = true;
+    document.head.appendChild(s);
+  }
+  (window as any).onTurnstileVerifyRegister = (token: string) => {
+    try {
+      const ev = new CustomEvent('turnstile-register-token', { detail: token });
+      window.dispatchEvent(ev);
+    } catch {}
+  };
+}
+
+// Abonne la page pour récupérer le token et l’enregistrer en state
+export function useRegisterTurnstile(setter: (t: string) => void) {
+  useEffect(() => {
+    const handler = (e: any) => setter(e.detail as string);
+    window.addEventListener('turnstile-register-token', handler);
+    return () => window.removeEventListener('turnstile-register-token', handler);
+  }, [setter]);
+}

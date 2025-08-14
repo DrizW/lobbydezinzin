@@ -88,9 +88,25 @@ export const authOptions: NextAuthOptions = {
         // 2FA enforcement si activée
         if (user.twoFactorEnabled) {
           const token = (credentials as any)?.totp as string | undefined;
-          const ok = token && user.twoFactorSecret
-            ? speakeasy.totp.verify({ secret: user.twoFactorSecret, encoding: "base32", token, window: 1 })
-            : false;
+          let ok = false;
+          if (token && user.twoFactorSecret) {
+            ok = speakeasy.totp.verify({ secret: user.twoFactorSecret, encoding: "base32", token, window: 1 });
+            if (!ok) {
+              // tenter codes de secours
+              try {
+                const codes = await prisma.twoFactorBackupCode.findMany({ where: { userId: user.id, used: false } });
+                for (const entry of codes) {
+                  const match = await bcrypt.compare(token, entry.codeHash);
+                  if (match) {
+                    ok = true;
+                    await prisma.twoFactorBackupCode.update({ where: { id: entry.id }, data: { used: true, usedAt: new Date() } });
+                    await recordAudit({ userId: user.id, action: "auth.signin.2fa_backup_used" });
+                    break;
+                  }
+                }
+              } catch {}
+            }
+          }
           if (!ok) {
             console.log("❌ 2FA requise ou code invalide");
             try { await recordAudit({ userId: user.id, action: "auth.signin.2fa_failed" }); } catch {}
