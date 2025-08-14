@@ -180,9 +180,9 @@ export default function NotificationBell() {
                           {notification.title}
                         </h4>
                         <div className="flex items-center space-x-2">
-                          <span className="text-xs text-gray-400">
-                            {formatTime(notification.timestamp)}
-                          </span>
+                                                     <span className="text-xs text-gray-400">
+                             {formatTime(notification.createdAt)}
+                           </span>
                           <button
                             onClick={() => removeNotification(notification.id)}
                             className="text-gray-500 hover:text-red-400 transition-colors"
