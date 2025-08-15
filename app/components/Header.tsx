@@ -230,17 +230,7 @@ export default function Header() {
                       </svg>
                       Sessions actives
                     </Link>
-                    <div className="px-4 py-3 text-sm text-gray-200 hover:bg-gray-700/50 transition-colors duration-200">
-                      <div className="flex items-center">
-                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4.5 19.5c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5-2.015 4.5-4.5 4.5-4.5-2.015-4.5-4.5z" />
-                        </svg>
-                        <span>Notifications</span>
-                      </div>
-                      <div className="mt-2">
-                        <NotificationBell />
-                      </div>
-                    </div>
+
                     {session.user?.role === "ADMIN" && (
                       <Link 
                         href="/admin" 
