@@ -178,12 +178,12 @@ export default function DashboardPage() {
           <Link href="/settings/security" className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-emerald-500/25 transition-all duration-200 transform hover:scale-105">Changer le mot de passe</Link>
         </div>
         {/* Header */}
-        <div className="text-center mb-12 relative">
-          {/* Bouton Admin (visible seulement pour les admins) */}
+        <div className="text-center mb-12">
+          {/* Bouton Admin (visible seulement pour les admins) - Amélioré pour mobile */}
           {session?.user?.role === "ADMIN" && (
-            <div className="absolute right-0 top-0">
+            <div className="mb-6 flex justify-center">
               <Link href="/admin">
-                <button className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 px-6 py-3 rounded-xl text-white font-bold transition-all duration-300 shadow-lg">
+                <button className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 px-6 py-3 rounded-xl text-white font-bold transition-all duration-300 shadow-lg transform hover:scale-105">
                   👑 Panel Admin
                 </button>
               </Link>
