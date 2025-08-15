@@ -89,48 +89,30 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
     setIsOpen(false);
 
     try {
-      // Appeler le nouvel endpoint DNS
-      const dnsResponse = await fetch("/api/dns/change-region", {
+      // Mettre à jour les paramètres utilisateur
+      const settingsResponse = await fetch("/api/user/settings", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          region: regionKey
+          selectedCountry: regionKey,
+          autoRotate
         }),
       });
 
-      if (dnsResponse.ok) {
-        const dnsData = await dnsResponse.json();
+      if (settingsResponse.ok) {
+        setSelectedRegion(regionKey);
+        setLastUpdated(new Date().toLocaleString("fr-FR"));
         
-        // Mettre à jour les paramètres utilisateur
-        const settingsResponse = await fetch("/api/user/settings", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            selectedCountry: regionKey,
-            autoRotate
-          }),
-        });
-
-        if (settingsResponse.ok) {
-          setSelectedRegion(regionKey);
-          setLastUpdated(new Date().toLocaleString("fr-FR"));
-          
-          // Callback pour notifier le parent
-          onRegionChange?.(regionKey);
-          
-          // Notification succès avec info DNS
-          showNotification(`🎯 ${REGIONS[regionKey].name} ${REGIONS[regionKey].flag} activé ! DNS mis à jour vers ${dnsData.data.region_name}.`, "success");
-        } else {
-          const error = await settingsResponse.json();
-          showNotification(error.error || "Erreur lors de la sauvegarde", "error");
-        }
+        // Callback pour notifier le parent
+        onRegionChange?.(regionKey);
+        
+        // Notification succès
+        showNotification(`🎯 ${REGIONS[regionKey].name} ${REGIONS[regionKey].flag} activé !`, "success");
       } else {
-        const error = await dnsResponse.json();
-        showNotification(error.error || "Erreur lors du changement DNS", "error");
+        const error = await settingsResponse.json();
+        showNotification(error.error || "Erreur lors de la sauvegarde", "error");
       }
     } catch (error) {
       console.error("Erreur changement région:", error);
