@@ -1,0 +1,27 @@
+[Unit]
+Description=LobbyDeZinzin DNS API
+After=network.target bind9.service
+Wants=bind9.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/lobbydezinzin
+ExecStart=/usr/bin/python3 /opt/lobbydezinzin/dns_api.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Variables d'environnement
+Environment=FLASK_ENV=production
+Environment=PYTHONPATH=/opt/lobbydezinzin
+
+# Sécurité
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/etc/bind/zones /var/log/lobbydezinzin /var/lib/lobbydezinzin
+
+[Install]
+WantedBy=multi-user.target
