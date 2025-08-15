@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Forwarded-For': request.headers.get('x-forwarded-for') || request.ip || 'unknown',
+                'X-Forwarded-For': request.headers.get('x-forwarded-for') || 'unknown',
                 'User-Agent': request.headers.get('user-agent') || 'unknown'
             },
             body: JSON.stringify({ region })
@@ -82,10 +82,10 @@ export async function GET(request: NextRequest) {
         
         const response = await fetch(dnsApiUrl, {
             method: 'GET',
-            headers: {
-                'X-Forwarded-For': request.headers.get('x-forwarded-for') || request.ip || 'unknown',
-                'User-Agent': request.headers.get('user-agent') || 'unknown'
-            }
+                    headers: {
+            'X-Forwarded-For': request.headers.get('x-forwarded-for') || 'unknown',
+            'User-Agent': request.headers.get('user-agent') || 'unknown'
+        }
         });
 
         const result = await response.json();
