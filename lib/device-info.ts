@@ -54,8 +54,11 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
 }
 
 export function getDeviceInfoFromRequest(request: any): DeviceInfo {
+  console.log('🔍 getDeviceInfoFromRequest - request:', JSON.stringify(request, null, 2));
+  
   // Valeurs par défaut si request est undefined
   if (!request) {
+    console.log('⚠️ Request est undefined, utilisation des valeurs par défaut');
     return {
       deviceName: 'Appareil inconnu',
       deviceType: 'desktop',
@@ -70,8 +73,11 @@ export function getDeviceInfoFromRequest(request: any): DeviceInfo {
   let ip = undefined;
 
   try {
+    console.log('🔍 Headers disponibles:', Object.keys(request));
+    
     // Si c'est un objet Request standard
     if (request.headers && typeof request.headers.get === 'function') {
+      console.log('📱 Utilisation de request.headers.get()');
       userAgent = request.headers.get('user-agent') || '';
       const forwardedFor = request.headers.get('x-forwarded-for');
       const realIp = request.headers.get('x-real-ip');
@@ -79,6 +85,7 @@ export function getDeviceInfoFromRequest(request: any): DeviceInfo {
     }
     // Si c'est un objet avec headers comme propriété
     else if (request.headers && typeof request.headers === 'object') {
+      console.log('📱 Utilisation de request.headers[]');
       userAgent = request.headers['user-agent'] || '';
       const forwardedFor = request.headers['x-forwarded-for'];
       const realIp = request.headers['x-real-ip'];
@@ -86,13 +93,31 @@ export function getDeviceInfoFromRequest(request: any): DeviceInfo {
     }
     // Si c'est un objet avec user-agent directement
     else if (request['user-agent']) {
+      console.log('📱 Utilisation de request["user-agent"]');
       userAgent = request['user-agent'];
     }
+    // Essayer d'autres propriétés possibles
+    else if (request.userAgent) {
+      console.log('📱 Utilisation de request.userAgent');
+      userAgent = request.userAgent;
+    }
+    else if (request['User-Agent']) {
+      console.log('📱 Utilisation de request["User-Agent"]');
+      userAgent = request['User-Agent'];
+    }
+    else {
+      console.log('⚠️ Aucune méthode trouvée pour extraire le user-agent');
+    }
+    
+    console.log('📱 User-Agent extrait:', userAgent);
+    console.log('🌐 IP extraite:', ip);
+    
   } catch (error) {
-    console.error('Erreur lors de l\'extraction des informations de device:', error);
+    console.error('❌ Erreur lors de l\'extraction des informations de device:', error);
   }
   
   const deviceInfo = parseUserAgent(userAgent);
+  console.log('📱 Informations d\'appareil finales:', deviceInfo);
   
   return {
     ...deviceInfo,
