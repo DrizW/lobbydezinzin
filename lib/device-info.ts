@@ -10,13 +10,25 @@ export interface DeviceInfo {
 export function parseUserAgent(userAgent: string): DeviceInfo {
   const ua = userAgent.toLowerCase();
   
-  // Détecter le navigateur
+  // Détecter le navigateur avec plus de précision
   let browser = 'Inconnu';
-  if (ua.includes('chrome')) browser = 'Chrome';
-  else if (ua.includes('firefox')) browser = 'Firefox';
-  else if (ua.includes('safari') && !ua.includes('chrome')) browser = 'Safari';
-  else if (ua.includes('edge')) browser = 'Edge';
-  else if (ua.includes('opera')) browser = 'Opera';
+  
+  // Détection spéciale pour iOS
+  if (ua.includes('iphone') || ua.includes('ipad')) {
+    if (ua.includes('crios')) browser = 'Chrome';
+    else if (ua.includes('fxios')) browser = 'Firefox';
+    else if (ua.includes('edgios')) browser = 'Edge';
+    else if (ua.includes('opios')) browser = 'Opera';
+    else if (ua.includes('safari')) browser = 'Safari';
+  }
+  // Détection standard pour autres plateformes
+  else {
+    if (ua.includes('chrome')) browser = 'Chrome';
+    else if (ua.includes('firefox')) browser = 'Firefox';
+    else if (ua.includes('safari') && !ua.includes('chrome')) browser = 'Safari';
+    else if (ua.includes('edge')) browser = 'Edge';
+    else if (ua.includes('opera')) browser = 'Opera';
+  }
   
   // Détecter le système d'exploitation
   let os = 'Inconnu';
@@ -42,8 +54,13 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
   else if (ua.includes('mac os')) deviceName = 'Mac';
   else if (ua.includes('linux')) deviceName = 'PC Linux';
   
-  // Ajouter le navigateur au nom de l'appareil
-  deviceName += ` - ${browser}`;
+  // Ajouter le navigateur au nom de l'appareil avec plus de précision
+  if (ua.includes('iphone') || ua.includes('ipad')) {
+    // Sur iOS, préciser que c'est le navigateur sur iOS
+    deviceName += ` - ${browser} sur iOS`;
+  } else {
+    deviceName += ` - ${browser}`;
+  }
   
   return {
     deviceName,
