@@ -3,55 +3,47 @@ import React, { useState, useEffect } from "react";
 import Flag from "./Flag";
 import { useSession } from "next-auth/react";
 
-// Mapping des régions avec leurs informations (South Africa actif, autres en stand-by)
+// Mapping des régions avec leurs informations (correspondant au VPS DNS)
 const REGIONS = {
-  'south-africa': {
-    name: "Afrique du Sud",
+  'johannesburg': {
+    name: "Johannesburg",
     flag: "🇿🇦",
     kdRange: "0.5-0.8",
     effectiveness: 98,
-    description: "Lobbies ultra-faciles (Johannesburg)",
+    description: "Lobbies ultra-faciles (Afrique du Sud)",
     color: "from-green-400 to-emerald-500"
   },
-  nigeria: {
-    name: "Nigeria",
-    flag: "🇳🇬",
-    kdRange: "0.6-0.9",
-    effectiveness: 95,
-    description: "Lobbies ultra-faciles (stand-by)",
-    color: "from-gray-400 to-gray-500"
-  },
-  taiwan: {
-    name: "Taiwan", 
-    flag: "🇹🇼",
+  'london': {
+    name: "Londres", 
+    flag: "🇬🇧",
     kdRange: "0.7-1.0",
-    effectiveness: 92,
-    description: "Très efficace (stand-by)",
-    color: "from-gray-400 to-gray-500"
+    effectiveness: 95,
+    description: "Très efficace (Royaume-Uni)",
+    color: "from-blue-400 to-cyan-500"
   },
-  morocco: {
-    name: "Maroc",
-    flag: "🇲🇦", 
+  'frankfurt': {
+    name: "Francfort",
+    flag: "🇩🇪",
     kdRange: "0.8-1.1",
-    effectiveness: 90,
-    description: "Excellent choix (stand-by)",
-    color: "from-gray-400 to-gray-500"
+    effectiveness: 92,
+    description: "Excellent choix (Allemagne)",
+    color: "from-yellow-400 to-orange-500"
   },
-  thailand: {
-    name: "Thaïlande",
-    flag: "🇹🇭",
-    kdRange: "0.8-1.2", 
-    effectiveness: 88,
-    description: "Très bon (stand-by)",
-    color: "from-gray-400 to-gray-500"
-  },
-  kenya: {
-    name: "Kenya",
-    flag: "🇰🇪",
+  'newyork': {
+    name: "New York",
+    flag: "🇺🇸",
     kdRange: "0.9-1.2",
-    effectiveness: 85,
-    description: "Très bon (stand-by)",
-    color: "from-gray-400 to-gray-500"
+    effectiveness: 90,
+    description: "Très bon (États-Unis)",
+    color: "from-red-400 to-pink-500"
+  },
+  'tokyo': {
+    name: "Tokyo",
+    flag: "🇯🇵",
+    kdRange: "1.0-1.3",
+    effectiveness: 88,
+    description: "Bon (Japon)",
+    color: "from-purple-400 to-indigo-500"
   }
 };
 
@@ -63,7 +55,7 @@ interface RegionSelectorProps {
 
 export default function RegionSelector({ onRegionChange }: RegionSelectorProps) {
   const { data: session } = useSession();
-  const [selectedRegion, setSelectedRegion] = useState<RegionKey>("south-africa");
+  const [selectedRegion, setSelectedRegion] = useState<RegionKey>("johannesburg");
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
@@ -81,7 +73,7 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
       const response = await fetch("/api/user/settings");
       if (response.ok) {
         const data = await response.json();
-        setSelectedRegion(data.selectedCountry || "south-africa");
+        setSelectedRegion(data.selectedCountry || "johannesburg");
         setAutoRotate(data.autoRotate || false);
         setLastUpdated(data.lastUpdated ? new Date(data.lastUpdated).toLocaleString("fr-FR") : "");
       }
@@ -97,30 +89,48 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
     setIsOpen(false);
 
     try {
-      const response = await fetch("/api/user/settings", {
+      // Appeler le nouvel endpoint DNS
+      const dnsResponse = await fetch("/api/dns/change-region", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          selectedCountry: regionKey,
-          autoRotate
+          region: regionKey
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setSelectedRegion(regionKey);
-        setLastUpdated(new Date().toLocaleString("fr-FR"));
+      if (dnsResponse.ok) {
+        const dnsData = await dnsResponse.json();
         
-        // Callback pour notifier le parent
-        onRegionChange?.(regionKey);
-        
-        // Notification succès avec info geolocation spoofing
-        showNotification(`🎯 ${REGIONS[regionKey].name} ${REGIONS[regionKey].flag} activé ! Géolocalisation spoofée, ping optimal maintenu.`, "success");
+        // Mettre à jour les paramètres utilisateur
+        const settingsResponse = await fetch("/api/user/settings", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            selectedCountry: regionKey,
+            autoRotate
+          }),
+        });
+
+        if (settingsResponse.ok) {
+          setSelectedRegion(regionKey);
+          setLastUpdated(new Date().toLocaleString("fr-FR"));
+          
+          // Callback pour notifier le parent
+          onRegionChange?.(regionKey);
+          
+          // Notification succès avec info DNS
+          showNotification(`🎯 ${REGIONS[regionKey].name} ${REGIONS[regionKey].flag} activé ! DNS mis à jour vers ${dnsData.data.region_name}.`, "success");
+        } else {
+          const error = await settingsResponse.json();
+          showNotification(error.error || "Erreur lors de la sauvegarde", "error");
+        }
       } else {
-        const error = await response.json();
-        showNotification(error.error || "Erreur lors du changement", "error");
+        const error = await dnsResponse.json();
+        showNotification(error.error || "Erreur lors du changement DNS", "error");
       }
     } catch (error) {
       console.error("Erreur changement région:", error);
