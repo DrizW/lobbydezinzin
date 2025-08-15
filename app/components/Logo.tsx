@@ -30,7 +30,7 @@ export default function Logo({ size = "md", className = "" }: LogoProps) {
         </span>
         <div className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-orange-500 to-blue-500 transition-all duration-300 ${isHovered ? 'w-full' : 'w-0'}`}></div>
       </span>
-      <span className="ml-2 text-xs text-gray-400 font-normal">WARZONE</span>
+
     </div>
   );
 } 
