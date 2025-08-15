@@ -3,47 +3,55 @@ import React, { useState, useEffect } from "react";
 import Flag from "./Flag";
 import { useSession } from "next-auth/react";
 
-// Mapping des régions avec leurs informations (correspondant au VPS DNS)
+// Mapping des régions avec leurs informations (anciennes régions)
 const REGIONS = {
-  'johannesburg': {
-    name: "Johannesburg",
+  'south-africa': {
+    name: "Afrique du Sud",
     flag: "🇿🇦",
     kdRange: "0.5-0.8",
     effectiveness: 98,
-    description: "Lobbies ultra-faciles (Afrique du Sud)",
+    description: "Lobbies ultra-faciles (Johannesburg)",
     color: "from-green-400 to-emerald-500"
   },
-  'london': {
-    name: "Londres", 
-    flag: "🇬🇧",
-    kdRange: "0.7-1.0",
+  nigeria: {
+    name: "Nigeria",
+    flag: "🇳🇬",
+    kdRange: "0.6-0.9",
     effectiveness: 95,
-    description: "Très efficace (Royaume-Uni)",
-    color: "from-blue-400 to-cyan-500"
+    description: "Lobbies ultra-faciles (stand-by)",
+    color: "from-gray-400 to-gray-500"
   },
-  'frankfurt': {
-    name: "Francfort",
-    flag: "🇩🇪",
-    kdRange: "0.8-1.1",
+  taiwan: {
+    name: "Taiwan", 
+    flag: "🇹🇼",
+    kdRange: "0.7-1.0",
     effectiveness: 92,
-    description: "Excellent choix (Allemagne)",
-    color: "from-yellow-400 to-orange-500"
+    description: "Très efficace (stand-by)",
+    color: "from-gray-400 to-gray-500"
   },
-  'newyork': {
-    name: "New York",
-    flag: "🇺🇸",
-    kdRange: "0.9-1.2",
+  morocco: {
+    name: "Maroc",
+    flag: "🇲🇦", 
+    kdRange: "0.8-1.1",
     effectiveness: 90,
-    description: "Très bon (États-Unis)",
-    color: "from-red-400 to-pink-500"
+    description: "Excellent choix (stand-by)",
+    color: "from-gray-400 to-gray-500"
   },
-  'tokyo': {
-    name: "Tokyo",
-    flag: "🇯🇵",
-    kdRange: "1.0-1.3",
+  thailand: {
+    name: "Thaïlande",
+    flag: "🇹🇭",
+    kdRange: "0.8-1.2", 
     effectiveness: 88,
-    description: "Bon (Japon)",
-    color: "from-purple-400 to-indigo-500"
+    description: "Très bon (stand-by)",
+    color: "from-gray-400 to-gray-500"
+  },
+  kenya: {
+    name: "Kenya",
+    flag: "🇰🇪",
+    kdRange: "0.9-1.2",
+    effectiveness: 85,
+    description: "Très bon (stand-by)",
+    color: "from-gray-400 to-gray-500"
   }
 };
 
@@ -55,7 +63,7 @@ interface RegionSelectorProps {
 
 export default function RegionSelector({ onRegionChange }: RegionSelectorProps) {
   const { data: session } = useSession();
-  const [selectedRegion, setSelectedRegion] = useState<RegionKey>("johannesburg");
+  const [selectedRegion, setSelectedRegion] = useState<RegionKey>("south-africa");
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
@@ -73,7 +81,7 @@ export default function RegionSelector({ onRegionChange }: RegionSelectorProps) 
       const response = await fetch("/api/user/settings");
       if (response.ok) {
         const data = await response.json();
-        setSelectedRegion(data.selectedCountry || "johannesburg");
+        setSelectedRegion(data.selectedCountry || "south-africa");
         setAutoRotate(data.autoRotate || false);
         setLastUpdated(data.lastUpdated ? new Date(data.lastUpdated).toLocaleString("fr-FR") : "");
       }
