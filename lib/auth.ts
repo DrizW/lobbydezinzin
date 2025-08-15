@@ -144,7 +144,37 @@ export const authOptions: NextAuthOptions = {
       // Enregistrer la session après une connexion réussie
       if (user && account?.type === 'credentials') {
         try {
-          const deviceInfo = getDeviceInfoFromRequest(credentials?.req);
+          // Générer un sessionToken unique
+          const sessionToken = `session_${user.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          
+          // Récupérer les informations d'appareil depuis les credentials
+          let deviceInfo = {
+            deviceName: 'PC Windows - Chrome', // Valeur par défaut
+            deviceType: 'desktop' as const,
+            browser: 'Chrome',
+            os: 'Windows',
+            ip: undefined
+          };
+          
+          try {
+            const deviceInfoStr = (credentials as any)?.deviceInfo;
+            if (deviceInfoStr) {
+              const parsedDeviceInfo = JSON.parse(deviceInfoStr);
+              deviceInfo = {
+                deviceName: parsedDeviceInfo.deviceName || deviceInfo.deviceName,
+                deviceType: parsedDeviceInfo.deviceType || deviceInfo.deviceType,
+                browser: parsedDeviceInfo.browser || deviceInfo.browser,
+                os: parsedDeviceInfo.os || deviceInfo.os,
+                ip: parsedDeviceInfo.ip || deviceInfo.ip
+              };
+              console.log(`📱 Informations d'appareil récupérées pour ${user.email}:`, deviceInfo);
+            } else {
+              console.log(`📱 Utilisation d'informations d'appareil par défaut pour ${user.email}`);
+            }
+          } catch (error) {
+            console.error('Erreur lors du parsing des informations d\'appareil:', error);
+            console.log(`📱 Utilisation d'informations d'appareil par défaut pour ${user.email}`);
+          }
           
           // Marquer toutes les autres sessions comme non-actuelles
           await prisma.userSession.updateMany({
@@ -156,7 +186,7 @@ export const authOptions: NextAuthOptions = {
           await prisma.userSession.create({
             data: {
               userId: user.id,
-              sessionToken: account.providerAccountId || `session_${Date.now()}`,
+              sessionToken: sessionToken,
               isCurrent: true,
               deviceName: deviceInfo.deviceName,
               deviceType: deviceInfo.deviceType,
@@ -170,7 +200,7 @@ export const authOptions: NextAuthOptions = {
           await recordAudit({
             userId: user.id,
             action: 'NEW_LOGIN',
-            req: credentials?.req as any,
+            req: null,
             details: {
               deviceName: deviceInfo.deviceName,
               deviceType: deviceInfo.deviceType,

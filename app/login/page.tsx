@@ -17,10 +17,27 @@ export default function LoginPage() {
     
     console.log("🔄 Tentative de connexion côté client...");
     
+    // Capturer les informations d'appareil avant la connexion
+    let deviceInfo = null;
+    try {
+      const deviceResponse = await fetch('/api/auth/device-info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (deviceResponse.ok) {
+        const deviceData = await deviceResponse.json();
+        deviceInfo = deviceData.deviceInfo;
+        console.log('📱 Informations d\'appareil capturées:', deviceInfo);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la capture des informations d\'appareil:', error);
+    }
+    
     const res = await signIn("credentials", {
       email,
       password,
       totp: totp || undefined,
+      deviceInfo: deviceInfo ? JSON.stringify(deviceInfo) : undefined,
       redirect: false, // Ne pas rediriger automatiquement
     });
     
